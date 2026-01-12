@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals',
   manifest: '/manifest.json',
   themeColor: '#0ea5e9',
+  icons: {
+    icon: '/favicon.png',
+    apple: '/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -32,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/icon-192.png" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body className={inter.className}>
