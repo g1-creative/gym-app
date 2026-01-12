@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
@@ -395,7 +395,7 @@ export function Component() {
                     transition={{ delay: 0.2 }}
                     className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80"
                   >
-                    Welcome Back
+                    {isSignUp ? 'Create Account' : 'Welcome Back'}
                   </motion.h1>
                   
                   <motion.p
@@ -404,7 +404,7 @@ export function Component() {
                     transition={{ delay: 0.3 }}
                     className="text-white/60 text-xs"
                   >
-                    Sign in to continue to Gym Tracker
+                    {isSignUp ? 'Sign up to start tracking your workouts' : 'Sign in to continue to Gym Tracker'}
                   </motion.p>
                 </div>
 
