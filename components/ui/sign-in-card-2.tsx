@@ -4,8 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { signIn, signUp } from '@/app/actions/auth';
 
 import { cn } from "@/lib/utils"
 
@@ -35,7 +34,6 @@ export function Component() {
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const router = useRouter();
 
   // Detect touch device on mount
   useEffect(() => {
@@ -66,63 +64,29 @@ export function Component() {
     setIsLoading(true);
     setError(null);
 
-    const supabase = createClient();
-
     try {
       if (isSignUp) {
-        const { data: signUpData, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const result = await signUp(email, password);
         
-        if (authError) throw authError;
-        
-        // If user is automatically signed in (email confirmation disabled), redirect
-        if (signUpData.user && signUpData.session) {
-          // Email confirmation is disabled - user is automatically signed in
-          // Wait for cookies to be set, then verify and redirect
-          await new Promise(resolve => setTimeout(resolve, 300));
-          
-          // Verify the session is set
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            // Force a full page reload to ensure server picks up the session
-            window.location.replace('/');
-          } else {
-            setError('Session not recognized. Please try again.');
-            setIsLoading(false);
-          }
-        } else {
-          // Email confirmation is enabled - show message
+        if (result?.error) {
+          setError(result.error);
+          setIsLoading(false);
+        } else if (result?.success) {
+          // Email confirmation is enabled
           setError(null);
-          alert('Account created! Please check your email to confirm your account.');
+          alert(result.message);
           setIsSignUp(false); // Switch back to sign in
-        }
-      } else {
-        const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (authError) throw authError;
-        
-        if (signInData.session) {
-          // Wait for cookies to be set, then verify and redirect
-          await new Promise(resolve => setTimeout(resolve, 300));
-          
-          // Verify the session is set
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            // Force a full page reload to ensure server picks up the session
-            window.location.replace('/');
-          } else {
-            setError('Session not recognized. Please try again.');
-            setIsLoading(false);
-          }
-        } else {
-          setError('Session not created. Please try again.');
           setIsLoading(false);
         }
+        // If redirect happens, this code won't run
+      } else {
+        const result = await signIn(email, password);
+        
+        if (result?.error) {
+          setError(result.error);
+          setIsLoading(false);
+        }
+        // If redirect happens, this code won't run
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
