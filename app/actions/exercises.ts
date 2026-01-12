@@ -39,10 +39,10 @@ export async function createExercise(formData: FormData) {
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  // Using double assertion to work around TypeScript's strict type checking
+  // Cast to any to bypass TypeScript's strict type checking for insert operations
   const { data, error } = await supabase
     .from('exercises')
-    .insert(insertData as unknown as ExerciseInsert)
+    .insert(insertData as any)
     .select()
     .single()
 
