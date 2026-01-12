@@ -86,10 +86,18 @@ export function Component() {
           setError(authError.message);
           setIsLoading(false);
         } else if (data.user && data.session) {
-          console.log('[CLIENT] signUp success with session, redirecting...');
-          // Small delay to ensure cookies are fully set
-          await new Promise(resolve => setTimeout(resolve, 500));
-          window.location.href = '/';
+          console.log('[CLIENT] signUp success with session');
+          
+          // Force cookie refresh by calling getSession
+          const { data: { session } } = await supabase.auth.getSession();
+          console.log('[CLIENT] Session confirmed after getSession:', !!session);
+          
+          // Wait longer for cookies to be written
+          console.log('[CLIENT] Waiting for cookies to propagate...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          console.log('[CLIENT] Redirecting to home page...');
+          window.location.replace('/');
         } else if (data.user && !data.session) {
           console.log('[CLIENT] signUp requires email confirmation');
           setError(null);
@@ -121,10 +129,26 @@ export function Component() {
           setError(authError.message);
           setIsLoading(false);
         } else if (data.session) {
-          console.log('[CLIENT] signIn success with session, redirecting...');
-          // Small delay to ensure cookies are fully set
-          await new Promise(resolve => setTimeout(resolve, 500));
-          window.location.href = '/';
+          console.log('[CLIENT] signIn success with session');
+          console.log('[CLIENT] Session token:', data.session.access_token.substring(0, 20) + '...');
+          
+          // Force cookie refresh by calling getSession
+          const { data: { session } } = await supabase.auth.getSession();
+          console.log('[CLIENT] Session confirmed after getSession:', !!session);
+          
+          // Wait longer for cookies to be written
+          console.log('[CLIENT] Waiting for cookies to propagate...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Check if auth cookies exist
+          const cookies = document.cookie;
+          console.log('[CLIENT] Current cookies:', cookies.split(';').map(c => c.trim().split('=')[0]));
+          const hasAuthCookie = cookies.includes('sb-') || cookies.includes('supabase');
+          console.log('[CLIENT] Has Supabase auth cookie:', hasAuthCookie);
+          
+          console.log('[CLIENT] Redirecting to home page...');
+          // Use replace to avoid back button issues
+          window.location.replace('/');
         } else {
           console.log('[CLIENT] signIn completed but no session created');
           setError('Failed to create session');
