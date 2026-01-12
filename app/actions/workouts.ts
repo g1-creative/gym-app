@@ -80,9 +80,9 @@ export async function updateWorkout(id: string, formData: FormData) {
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const { data, error } = await supabase
-    .from('workouts')
-    .update(validated as any)
+  const query = supabase.from('workouts') as any
+  const { data, error } = await query
+    .update(validated)
     .eq('id', id)
     .select()
     .single()
@@ -110,9 +110,9 @@ export async function deleteWorkout(id: string) {
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const { error } = await supabase
-    .from('workouts')
-    .update({ deleted_at: new Date().toISOString() } as any)
+  const query = supabase.from('workouts') as any
+  const { error } = await query
+    .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
 
   if (error) throw error

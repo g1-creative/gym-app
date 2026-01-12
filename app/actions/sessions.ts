@@ -64,12 +64,12 @@ export async function completeSession(id: string) {
   const durationSeconds = Math.floor((completedAt.getTime() - startedAt.getTime()) / 1000)
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const { data, error } = await supabase
-    .from('workout_sessions')
+  const query = supabase.from('workout_sessions') as any
+  const { data, error } = await query
     .update({
       completed_at: completedAt.toISOString(),
       duration_seconds: durationSeconds,
-    } as any)
+    })
     .eq('id', id)
     .eq('user_id', user.id)
     .select()

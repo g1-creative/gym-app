@@ -97,9 +97,9 @@ export async function updateSet(id: string, input: Partial<SetInput>) {
   const validated = setSchema.partial().parse(input)
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const { data, error } = await supabase
-    .from('sets')
-    .update(validated as any)
+  const query = supabase.from('sets') as any
+  const { data, error } = await query
+    .update(validated)
     .eq('id', id)
     .select(`
       *,
@@ -132,9 +132,9 @@ export async function deleteSet(id: string) {
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const { error } = await supabase
-    .from('sets')
-    .update({ deleted_at: new Date().toISOString() } as any)
+  const query = supabase.from('sets') as any
+  const { error } = await query
+    .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
 
   if (error) throw error
