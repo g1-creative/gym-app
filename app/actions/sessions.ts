@@ -59,22 +59,24 @@ export async function completeSession(id: string) {
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   // Cast the query builder to bypass type checking for partial selects
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/5f93ed16-d6e4-40d6-abc2-24ebc8a0a056',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'sessions.ts:54',message:'before query - query params',data:{id,userId:user.id},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/5f93ed16-d6e4-40d6-abc2-24ebc8a0a056',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'sessions.ts:54',message:'before query - query params',data:{id,userId:user.id},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix-v2',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
   // #endregion
   const query = supabase.from('workout_sessions') as any
-  const { data: session } = await query
+  const result = await query
     .select('started_at')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
+  
+  const session = result.data as { started_at: string } | null
 
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/5f93ed16-d6e4-40d6-abc2-24ebc8a0a056',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'sessions.ts:63',message:'after query - session data',data:{hasSession:!!session,sessionType:typeof session,sessionKeys:session?Object.keys(session):null,sessionStartedAt:session?.started_at},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/5f93ed16-d6e4-40d6-abc2-24ebc8a0a056',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'sessions.ts:63',message:'after query - session data',data:{hasSession:!!session,sessionType:typeof session,sessionKeys:session?Object.keys(session):null,sessionStartedAt:session?.started_at},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix-v2',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
   // #endregion
   if (!session) throw new Error('Session not found')
 
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/5f93ed16-d6e4-40d6-abc2-24ebc8a0a056',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'sessions.ts:66',message:'before accessing started_at',data:{sessionExists:!!session,hasStartedAt:'started_at' in (session||{})},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/5f93ed16-d6e4-40d6-abc2-24ebc8a0a056',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'sessions.ts:66',message:'before accessing started_at',data:{sessionExists:!!session,hasStartedAt:'started_at' in (session||{})},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix-v2',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
   // #endregion
   const startedAt = new Date(session.started_at)
   const completedAt = new Date()
