@@ -3,6 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Database } from '@/types/database'
+
+type ExerciseInsert = Database['public']['Tables']['exercises']['Insert']
 
 const exerciseSchema = z.object({
   name: z.string().min(1).max(100),
@@ -26,12 +29,18 @@ export async function createExercise(formData: FormData) {
 
   const validated = exerciseSchema.parse(rawData)
 
+  // Explicitly type the insert data to match Database schema
+  const insertData: ExerciseInsert = {
+    user_id: user.id,
+    name: validated.name,
+    muscle_groups: validated.muscle_groups ?? null,
+    equipment: validated.equipment ?? null,
+    is_custom: validated.is_custom ?? false,
+  }
+
   const { data, error } = await supabase
     .from('exercises')
-    .insert({
-      user_id: user.id,
-      ...validated,
-    })
+    .insert(insertData)
     .select()
     .single()
 
