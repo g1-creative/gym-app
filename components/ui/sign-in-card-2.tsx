@@ -148,14 +148,16 @@ export function Component() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="w-full max-w-sm relative z-10"
-        style={{ perspective: 1500 }}
+        style={!isTouchDevice ? { perspective: 1500 } : undefined}
       >
         <motion.div
           className="relative"
-          style={{ rotateX, rotateY }}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          whileHover={{ z: 10 }}
+          style={!isTouchDevice ? { rotateX, rotateY } : undefined}
+          {...(!isTouchDevice && {
+            onMouseMove: handleMouseMove,
+            onMouseLeave: handleMouseLeave,
+            whileHover: { z: 10 }
+          })}
         >
           <div className="relative group">
             {/* Card glow effect - reduced intensity */}
