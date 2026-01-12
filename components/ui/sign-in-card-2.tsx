@@ -80,8 +80,7 @@ export function Component() {
         // If user is automatically signed in (email confirmation disabled), redirect
         if (signUpData.user && signUpData.session) {
           // Email confirmation is disabled - user is automatically signed in
-          router.push('/');
-          router.refresh();
+          window.location.href = '/';
         } else {
           // Email confirmation is enabled - show message
           setError(null);
@@ -89,15 +88,22 @@ export function Component() {
           setIsSignUp(false); // Switch back to sign in
         }
       } else {
-        const { error: authError } = await supabase.auth.signInWithPassword({
+        const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
         if (authError) throw authError;
         
-        router.push('/');
-        router.refresh();
+        // Wait a moment for session to be established, then redirect
+        if (signInData.session) {
+          // Use window.location for a hard redirect to ensure session is picked up
+          window.location.href = '/';
+        } else {
+          // Fallback to router if session not immediately available
+          router.push('/');
+          router.refresh();
+        }
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
