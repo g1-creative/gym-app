@@ -4,13 +4,22 @@ import Link from 'next/link'
 import { getActiveSession, getSessions } from './actions/sessions'
 import { getPrograms } from './actions/programs'
 
+// Force dynamic rendering to prevent caching issues
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  console.log('[HOME PAGE] Rendering, hasUser:', !!user, 'userId:', user?.id)
+
   if (!user) {
+    console.log('[HOME PAGE] No user, redirecting to login')
     redirect('/login')
   }
+
+  console.log('[HOME PAGE] User authenticated, loading dashboard data')
 
   const [activeSession, recentSessions, programs] = await Promise.all([
     getActiveSession(),
