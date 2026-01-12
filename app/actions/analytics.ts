@@ -38,11 +38,18 @@ export async function getExerciseStats(exerciseId: string, days = 90) {
     return null
   }
 
-  const exerciseName = (sets[0].exercise as any).name
+  // Get exercise name separately
+  const { data: exercise } = await supabase
+    .from('exercises')
+    .select('name')
+    .eq('id', exerciseId)
+    .single()
+
+  if (!exercise) throw new Error('Exercise not found')
 
   const stats: ExerciseStats = {
     exerciseId,
-    exerciseName,
+    exerciseName: exercise.name,
     totalSets: sets.length,
     totalVolume: sets.reduce((sum, set) => sum + (set.volume || 0), 0),
     maxWeight: Math.max(...sets.map(s => s.weight || 0)),
