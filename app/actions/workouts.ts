@@ -79,9 +79,10 @@ export async function updateWorkout(id: string, formData: FormData) {
     throw new Error('Workout not found')
   }
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   const { data, error } = await supabase
     .from('workouts')
-    .update(validated)
+    .update(validated as any)
     .eq('id', id)
     .select()
     .single()
@@ -108,9 +109,10 @@ export async function deleteWorkout(id: string) {
     throw new Error('Workout not found')
   }
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   const { error } = await supabase
     .from('workouts')
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: new Date().toISOString() } as any)
     .eq('id', id)
 
   if (error) throw error

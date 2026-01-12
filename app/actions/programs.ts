@@ -56,9 +56,10 @@ export async function updateProgram(id: string, formData: FormData) {
 
   const validated = programSchema.partial().parse(rawData)
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   const { data, error } = await supabase
     .from('programs')
-    .update(validated)
+    .update(validated as any)
     .eq('id', id)
     .eq('user_id', user.id)
     .select()
@@ -77,9 +78,10 @@ export async function deleteProgram(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   const { error } = await supabase
     .from('programs')
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: new Date().toISOString() } as any)
     .eq('id', id)
     .eq('user_id', user.id)
 
