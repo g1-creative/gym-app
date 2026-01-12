@@ -34,7 +34,7 @@ export function LoginForm() {
           password,
         })
         if (error) throw error
-        router.push('/')
+        router.replace('/')
         router.refresh()
       }
     } catch (err: any) {
