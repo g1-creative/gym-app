@@ -24,12 +24,15 @@ export async function createProgram(formData: FormData) {
 
   const validated = programSchema.parse(rawData)
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const insertData = {
+    user_id: user.id,
+    ...validated,
+  }
+
   const { data, error } = await supabase
     .from('programs')
-    .insert({
-      user_id: user.id,
-      ...validated,
-    })
+    .insert(insertData as any)
     .select()
     .single()
 

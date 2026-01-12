@@ -24,13 +24,16 @@ export async function createSession(formData: FormData) {
 
   const validated = sessionSchema.parse(rawData)
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const insertData = {
+    user_id: user.id,
+    ...validated,
+    started_at: new Date().toISOString(),
+  }
+
   const { data, error } = await supabase
     .from('workout_sessions')
-    .insert({
-      user_id: user.id,
-      ...validated,
-      started_at: new Date().toISOString(),
-    })
+    .insert(insertData as any)
     .select()
     .single()
 

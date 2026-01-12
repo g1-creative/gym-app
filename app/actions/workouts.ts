@@ -39,9 +39,10 @@ export async function createWorkout(formData: FormData) {
 
   if (!program) throw new Error('Program not found')
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   const { data, error } = await supabase
     .from('workouts')
-    .insert(validated)
+    .insert(validated as any)
     .select()
     .single()
 

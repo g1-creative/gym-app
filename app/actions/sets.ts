@@ -60,9 +60,10 @@ export async function logSet(input: SetInput & { sessionId: string; exerciseId: 
     notes: input.notes,
   })
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
   const { data, error } = await supabase
     .from('sets')
-    .insert(validated)
+    .insert(validated as any)
     .select(`
       *,
       exercise:exercises(*)
