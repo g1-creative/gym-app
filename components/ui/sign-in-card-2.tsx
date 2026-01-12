@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 import { cn } from "@/lib/utils"
 
@@ -29,6 +31,8 @@ export function Component() {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // For 3D card effect - increased rotation range for more pronounced 3D effect
   const mouseX = useMotionValue(0);
@@ -47,10 +51,27 @@ export function Component() {
     mouseY.set(0);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000);
+    setError(null);
+
+    const supabase = createClient();
+
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (authError) throw authError;
+      
+      router.push('/');
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -352,12 +373,22 @@ export function Component() {
                     transition={{ delay: 0.3 }}
                     className="text-white/60 text-xs"
                   >
-                    Sign in to continue to StyleMe
+                    Sign in to continue to Gym Tracker
                   </motion.p>
                 </div>
 
                 {/* Login form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Error message */}
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg p-3 text-sm"
+                    >
+                      {error}
+                    </motion.div>
+                  )}
                   <motion.div className="space-y-3">
                     {/* Email input */}
                     <motion.div 
