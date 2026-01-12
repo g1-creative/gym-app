@@ -6,7 +6,10 @@ export default async function LoginPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  console.log('[LOGIN PAGE] Rendering, hasUser:', !!user)
+
   if (user) {
+    console.log('[LOGIN PAGE] User authenticated, redirecting to /')
     redirect('/')
   }
 

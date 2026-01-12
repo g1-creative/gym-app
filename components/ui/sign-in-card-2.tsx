@@ -63,38 +63,53 @@ export function Component() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    console.log('[CLIENT] Form submitted', { isSignUp, email });
     setIsLoading(true);
     setError(null);
 
     try {
       if (isSignUp) {
+        console.log('[CLIENT] Calling signUp...');
         const result = await signUp(email, password);
+        console.log('[CLIENT] signUp result:', result);
         
         if (result?.error) {
+          console.log('[CLIENT] signUp error:', result.error);
           setError(result.error);
           setIsLoading(false);
         } else if (result?.requiresConfirmation) {
+          console.log('[CLIENT] signUp requires confirmation');
           // Email confirmation is enabled
           setError(null);
           alert(result.message);
           setIsSignUp(false); // Switch back to sign in
           setIsLoading(false);
         } else if (result?.success) {
+          console.log('[CLIENT] signUp success, redirecting...');
           // Successfully signed up and logged in - force a full page reload
           window.location.replace('/');
         }
       } else {
+        console.log('[CLIENT] Calling signIn...');
         const result = await signIn(email, password);
+        console.log('[CLIENT] signIn result:', result);
         
         if (result?.error) {
+          console.log('[CLIENT] signIn error:', result.error);
           setError(result.error);
           setIsLoading(false);
         } else if (result?.success) {
+          console.log('[CLIENT] signIn success, redirecting to home...');
           // Successfully signed in - force a full page reload
           window.location.replace('/');
+        } else {
+          console.log('[CLIENT] signIn unexpected result:', result);
+          setError('Unexpected response from server');
+          setIsLoading(false);
         }
       }
     } catch (err: any) {
+      console.error('[CLIENT] Exception during auth:', err);
       setError(err.message || 'An error occurred');
       setIsLoading(false);
     }

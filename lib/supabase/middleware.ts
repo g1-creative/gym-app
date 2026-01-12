@@ -36,8 +36,15 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  console.log('[MIDDLEWARE]', {
+    path: request.nextUrl.pathname,
+    hasUser: !!user,
+    userId: user?.id
+  })
+
   // Redirect authenticated users away from login page
   if (user && request.nextUrl.pathname.startsWith('/login')) {
+    console.log('[MIDDLEWARE] Redirecting authenticated user from /login to /')
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
@@ -49,6 +56,7 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
+    console.log('[MIDDLEWARE] Redirecting unauthenticated user to /login')
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
