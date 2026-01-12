@@ -80,16 +80,17 @@ export function Component() {
         // If user is automatically signed in (email confirmation disabled), redirect
         if (signUpData.user && signUpData.session) {
           // Email confirmation is disabled - user is automatically signed in
-          // Verify the session is set by checking the user
+          // Wait for cookies to be set, then verify and redirect
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Verify the session is set
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            // Session is confirmed, now redirect
-            window.location.href = '/';
+            // Force a full page reload to ensure server picks up the session
+            window.location.replace('/');
           } else {
-            // Wait a bit more and try again
-            setTimeout(() => {
-              window.location.href = '/';
-            }, 500);
+            setError('Session not recognized. Please try again.');
+            setIsLoading(false);
           }
         } else {
           // Email confirmation is enabled - show message
@@ -106,16 +107,17 @@ export function Component() {
         if (authError) throw authError;
         
         if (signInData.session) {
-          // Verify the session is set by checking the user
+          // Wait for cookies to be set, then verify and redirect
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Verify the session is set
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            // Session is confirmed, now redirect
-            window.location.href = '/';
+            // Force a full page reload to ensure server picks up the session
+            window.location.replace('/');
           } else {
-            // Wait a bit more and try again
-            setTimeout(() => {
-              window.location.href = '/';
-            }, 500);
+            setError('Session not recognized. Please try again.');
+            setIsLoading(false);
           }
         } else {
           setError('Session not created. Please try again.');
