@@ -51,18 +51,27 @@ export async function getExerciseStats(exerciseId: string, days = 90) {
   // Type assertion needed because Supabase select with single field returns a narrowed type
   const exerciseName = (exercise as { name: string }).name
 
+  // Type assertion for sets with joined data
+  type SetWithSession = {
+    volume: number | null
+    weight: number | null
+    reps: number | null
+    workout_sessions: { started_at: string }
+  }
+  const typedSets = sets as SetWithSession[]
+
   const stats: ExerciseStats = {
     exerciseId,
     exerciseName,
-    totalSets: sets.length,
-    totalVolume: sets.reduce((sum, set) => sum + (set.volume || 0), 0),
-    maxWeight: Math.max(...sets.map(s => s.weight || 0)),
-    maxReps: Math.max(...sets.map(s => s.reps || 0)),
-    maxVolume: Math.max(...sets.map(s => s.volume || 0)),
-    averageWeight: sets.reduce((sum, s) => sum + (s.weight || 0), 0) / sets.length,
-    averageReps: sets.reduce((sum, s) => sum + (s.reps || 0), 0) / sets.length,
+    totalSets: typedSets.length,
+    totalVolume: typedSets.reduce((sum, set) => sum + (set.volume || 0), 0),
+    maxWeight: Math.max(...typedSets.map(s => s.weight || 0)),
+    maxReps: Math.max(...typedSets.map(s => s.reps || 0)),
+    maxVolume: Math.max(...typedSets.map(s => s.volume || 0)),
+    averageWeight: typedSets.reduce((sum, s) => sum + (s.weight || 0), 0) / typedSets.length,
+    averageReps: typedSets.reduce((sum, s) => sum + (s.reps || 0), 0) / typedSets.length,
     prDate: null,
-    lastSessionDate: sets[0] ? (sets[0].workout_sessions as any).started_at : null,
+    lastSessionDate: typedSets[0] ? typedSets[0].workout_sessions.started_at : null,
   }
 
   return stats
@@ -129,30 +138,40 @@ export async function getProgressiveOverloadComparison(exerciseId: string, curre
     .limit(1)
     .maybeSingle()
 
+  // Type assertion for sets with joined data
+  type SetWithSession = {
+    weight: number | null
+    reps: number | null
+    volume: number | null
+    rpe: number | null
+    workout_sessions: { started_at: string }
+  }
+
   const lastSession = lastSessionSet
     ? {
-        weight: lastSessionSet.weight,
-        reps: lastSessionSet.reps,
-        volume: lastSessionSet.volume,
-        rpe: lastSessionSet.rpe,
-        date: (lastSessionSet.workout_sessions as any).started_at,
+        weight: (lastSessionSet as SetWithSession).weight,
+        reps: (lastSessionSet as SetWithSession).reps,
+        volume: (lastSessionSet as SetWithSession).volume,
+        rpe: (lastSessionSet as SetWithSession).rpe,
+        date: (lastSessionSet as SetWithSession).workout_sessions.started_at,
       }
     : { weight: null, reps: null, volume: null, rpe: null, date: null }
 
-  const weeklyAverage = weeklySets && weeklySets.length > 0
+  const typedWeeklySets = (weeklySets || []) as SetWithSession[]
+  const weeklyAverage = typedWeeklySets.length > 0
     ? {
-        weight: weeklySets.reduce((sum, s) => sum + (s.weight || 0), 0) / weeklySets.length,
-        reps: weeklySets.reduce((sum, s) => sum + (s.reps || 0), 0) / weeklySets.length,
-        volume: weeklySets.reduce((sum, s) => sum + (s.volume || 0), 0) / weeklySets.length,
+        weight: typedWeeklySets.reduce((sum, s) => sum + (s.weight || 0), 0) / typedWeeklySets.length,
+        reps: typedWeeklySets.reduce((sum, s) => sum + (s.reps || 0), 0) / typedWeeklySets.length,
+        volume: typedWeeklySets.reduce((sum, s) => sum + (s.volume || 0), 0) / typedWeeklySets.length,
       }
     : { weight: null, reps: null, volume: null }
 
   const allTimePR = allTimeSets
     ? {
-        weight: allTimeSets.weight,
-        reps: allTimeSets.reps,
-        volume: allTimeSets.volume,
-        date: (allTimeSets.workout_sessions as any).started_at,
+        weight: (allTimeSets as SetWithSession).weight,
+        reps: (allTimeSets as SetWithSession).reps,
+        volume: (allTimeSets as SetWithSession).volume,
+        date: (allTimeSets as SetWithSession).workout_sessions.started_at,
       }
     : { weight: null, reps: null, volume: null, date: null }
 
@@ -212,11 +231,21 @@ export async function getExerciseChartData(exerciseId: string, days = 90): Promi
 
   if (error) throw error
 
+  // Type assertion for sets with joined data
+  type SetWithSessionForChart = {
+    weight: number | null
+    reps: number | null
+    volume: number | null
+    rpe: number | null
+    workout_sessions: { started_at: string }
+  }
+  const typedSets = (sets || []) as SetWithSessionForChart[]
+
   // Group by date and calculate averages
   const dateMap = new Map<string, { weights: number[]; reps: number[]; volumes: number[]; rpes: number[] }>()
 
-  sets.forEach((set) => {
-    const date = new Date((set.workout_sessions as any).started_at).toISOString().split('T')[0]
+  typedSets.forEach((set) => {
+    const date = new Date(set.workout_sessions.started_at).toISOString().split('T')[0]
     if (!dateMap.has(date)) {
       dateMap.set(date, { weights: [], reps: [], volumes: [], rpes: [] })
     }
