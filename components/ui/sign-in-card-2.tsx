@@ -80,11 +80,17 @@ export function Component() {
         // If user is automatically signed in (email confirmation disabled), redirect
         if (signUpData.user && signUpData.session) {
           // Email confirmation is disabled - user is automatically signed in
-          // Refresh the router to pick up the new session, then redirect
-          router.refresh();
-          setTimeout(() => {
+          // Verify the session is set by checking the user
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            // Session is confirmed, now redirect
             window.location.href = '/';
-          }, 200);
+          } else {
+            // Wait a bit more and try again
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 500);
+          }
         } else {
           // Email confirmation is enabled - show message
           setError(null);
@@ -100,12 +106,17 @@ export function Component() {
         if (authError) throw authError;
         
         if (signInData.session) {
-          // Refresh the router to pick up the new session, then redirect
-          router.refresh();
-          // Use a small delay and then redirect to ensure session is recognized
-          setTimeout(() => {
+          // Verify the session is set by checking the user
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            // Session is confirmed, now redirect
             window.location.href = '/';
-          }, 200);
+          } else {
+            // Wait a bit more and try again
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 500);
+          }
         } else {
           setError('Session not created. Please try again.');
           setIsLoading(false);
