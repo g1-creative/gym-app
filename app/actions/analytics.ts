@@ -39,17 +39,21 @@ export async function getExerciseStats(exerciseId: string, days = 90) {
   }
 
   // Get exercise name separately
-  const { data: exercise } = await supabase
+  const { data: exercise, error: exerciseError } = await supabase
     .from('exercises')
     .select('name')
     .eq('id', exerciseId)
     .single()
 
+  if (exerciseError) throw exerciseError
   if (!exercise) throw new Error('Exercise not found')
+
+  // Type assertion needed because Supabase select with single field returns a narrowed type
+  const exerciseName = (exercise as { name: string }).name
 
   const stats: ExerciseStats = {
     exerciseId,
-    exerciseName: exercise.name,
+    exerciseName,
     totalSets: sets.length,
     totalVolume: sets.reduce((sum, set) => sum + (set.volume || 0), 0),
     maxWeight: Math.max(...sets.map(s => s.weight || 0)),
@@ -78,6 +82,9 @@ export async function getProgressiveOverloadComparison(exerciseId: string, curre
     .single()
 
   if (!exercise) throw new Error('Exercise not found')
+  
+  // Type assertion needed because Supabase select with single field returns a narrowed type
+  const exerciseName = (exercise as { name: string }).name
 
   // Get last session data
   const { data: lastSessionSet } = await supabase
@@ -166,7 +173,7 @@ export async function getProgressiveOverloadComparison(exerciseId: string, curre
 
   const comparison: ProgressiveOverloadComparison = {
     exerciseId,
-    exerciseName: exercise.name,
+    exerciseName,
     current: {
       weight: currentSet.weight,
       reps: currentSet.reps,
