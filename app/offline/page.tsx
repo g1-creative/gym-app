@@ -1,9 +1,5 @@
 'use client'
 
-// Prevent static generation - this page should be rendered on-demand
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 export default function OfflinePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex items-center justify-center px-4">
