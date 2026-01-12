@@ -2,10 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { signIn, signUp } from '@/app/actions/auth';
 import { createClient } from '@/lib/supabase/client';
 
 import { cn } from "@/lib/utils"
@@ -27,7 +25,6 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export function Component() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,84 +67,67 @@ export function Component() {
 
     try {
       if (isSignUp) {
-        console.log('[CLIENT] Calling signUp...');
-        const result = await signUp(email, password);
-        console.log('[CLIENT] signUp result:', result);
+        console.log('[CLIENT] Calling signUp via Supabase client...');
+        const supabase = createClient();
         
-        if (result?.error) {
-          console.log('[CLIENT] signUp error:', result.error);
-          setError(result.error);
+        const { data, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        console.log('[CLIENT] signUp result:', { 
+          hasSession: !!data.session, 
+          hasUser: !!data.user,
+          error: authError?.message 
+        });
+        
+        if (authError) {
+          console.log('[CLIENT] signUp error:', authError.message);
+          setError(authError.message);
           setIsLoading(false);
-        } else if (result?.requiresConfirmation) {
-          console.log('[CLIENT] signUp requires confirmation');
-          // Email confirmation is enabled
+        } else if (data.user && data.session) {
+          console.log('[CLIENT] signUp success with session, redirecting...');
+          // Small delay to ensure cookies are fully set
+          await new Promise(resolve => setTimeout(resolve, 500));
+          window.location.href = '/';
+        } else if (data.user && !data.session) {
+          console.log('[CLIENT] signUp requires email confirmation');
           setError(null);
-          alert(result.message);
+          alert('Please check your email to confirm your account.');
           setIsSignUp(false); // Switch back to sign in
           setIsLoading(false);
-        } else if (result?.success) {
-          console.log('[CLIENT] signUp success, verifying session...');
-          
-          // Verify session is set before redirecting
-          const supabase = createClient();
-          let retries = 0;
-          const maxRetries = 5;
-          
-          while (retries < maxRetries) {
-            const { data: { session } } = await supabase.auth.getSession();
-            console.log(`[CLIENT] Session check attempt ${retries + 1}:`, !!session);
-            
-            if (session) {
-              console.log('[CLIENT] Session verified, redirecting to home...');
-              window.location.replace('/');
-              return;
-            }
-            
-            // Wait before retrying
-            await new Promise(resolve => setTimeout(resolve, 300));
-            retries++;
-          }
-          
-          console.log('[CLIENT] Session not verified after retries, forcing redirect anyway...');
-          window.location.replace('/');
+        } else {
+          console.log('[CLIENT] signUp completed but no user created');
+          setError('Failed to create account');
+          setIsLoading(false);
         }
       } else {
-        console.log('[CLIENT] Calling signIn...');
-        const result = await signIn(email, password);
-        console.log('[CLIENT] signIn result:', result);
+        console.log('[CLIENT] Calling signIn via Supabase client...');
+        const supabase = createClient();
         
-        if (result?.error) {
-          console.log('[CLIENT] signIn error:', result.error);
-          setError(result.error);
+        const { data, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        console.log('[CLIENT] signIn result:', { 
+          hasSession: !!data.session, 
+          hasUser: !!data.user,
+          error: authError?.message 
+        });
+        
+        if (authError) {
+          console.log('[CLIENT] signIn error:', authError.message);
+          setError(authError.message);
           setIsLoading(false);
-        } else if (result?.success) {
-          console.log('[CLIENT] signIn success, verifying session...');
-          
-          // Verify session is set before redirecting
-          const supabase = createClient();
-          let retries = 0;
-          const maxRetries = 5;
-          
-          while (retries < maxRetries) {
-            const { data: { session } } = await supabase.auth.getSession();
-            console.log(`[CLIENT] Session check attempt ${retries + 1}:`, !!session);
-            
-            if (session) {
-              console.log('[CLIENT] Session verified, redirecting to home...');
-              window.location.replace('/');
-              return;
-            }
-            
-            // Wait before retrying
-            await new Promise(resolve => setTimeout(resolve, 300));
-            retries++;
-          }
-          
-          console.log('[CLIENT] Session not verified after retries, forcing redirect anyway...');
-          window.location.replace('/');
+        } else if (data.session) {
+          console.log('[CLIENT] signIn success with session, redirecting...');
+          // Small delay to ensure cookies are fully set
+          await new Promise(resolve => setTimeout(resolve, 500));
+          window.location.href = '/';
         } else {
-          console.log('[CLIENT] signIn unexpected result:', result);
-          setError('Unexpected response from server');
+          console.log('[CLIENT] signIn completed but no session created');
+          setError('Failed to create session');
           setIsLoading(false);
         }
       }
