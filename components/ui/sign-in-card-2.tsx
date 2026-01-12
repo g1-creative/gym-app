@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -349,10 +350,17 @@ export function Component() {
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: "spring", duration: 0.8 }}
-                    className="mx-auto w-10 h-10 rounded-full border border-white/10 flex items-center justify-center relative overflow-hidden"
+                    className="mx-auto w-12 h-12 rounded-full border border-white/10 flex items-center justify-center relative overflow-hidden bg-white/5"
                   >
-                    {/* Logo placeholder - would be an SVG in practice */}
-                    <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">S</span>
+                    {/* Gym Tracker Logo */}
+                    <Image
+                      src="/gym-logo.png"
+                      alt="Gym Tracker Logo"
+                      width={40}
+                      height={40}
+                      className="object-contain p-1"
+                      priority
+                    />
                     
                     {/* Inner lighting effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50" />
