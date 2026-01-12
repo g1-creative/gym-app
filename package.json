@@ -9,13 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
     "@supabase/ssr": "^0.1.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.0.6",
+    "framer-motion": "^12.26.1",
+    "lucide-react": "^0.562.0",
     "next": "14.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.10.3",
-    "date-fns": "^3.0.6",
+    "tailwind-merge": "^3.4.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -30,4 +34,3 @@
     "typescript": "^5"
   }
 }
-
