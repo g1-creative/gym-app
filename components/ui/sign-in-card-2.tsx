@@ -80,11 +80,8 @@ export function Component() {
           setIsSignUp(false); // Switch back to sign in
           setIsLoading(false);
         } else if (result?.success) {
-          // Successfully signed up and logged in
-          router.refresh();
-          // Small delay to ensure cookies are set
-          await new Promise(resolve => setTimeout(resolve, 100));
-          window.location.href = '/';
+          // Successfully signed up and logged in - force a full page reload
+          window.location.replace('/');
         }
       } else {
         const result = await signIn(email, password);
@@ -93,11 +90,8 @@ export function Component() {
           setError(result.error);
           setIsLoading(false);
         } else if (result?.success) {
-          // Successfully signed in
-          router.refresh();
-          // Small delay to ensure cookies are set
-          await new Promise(resolve => setTimeout(resolve, 100));
-          window.location.href = '/';
+          // Successfully signed in - force a full page reload
+          window.location.replace('/');
         }
       }
     } catch (err: any) {
