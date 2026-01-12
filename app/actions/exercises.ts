@@ -30,7 +30,7 @@ export async function createExercise(formData: FormData) {
   const validated = exerciseSchema.parse(rawData)
 
   // Explicitly type the insert data to match Database schema
-  const insertData: ExerciseInsert = {
+  const insertData = {
     user_id: user.id,
     name: validated.name,
     muscle_groups: validated.muscle_groups ?? null,
@@ -38,9 +38,11 @@ export async function createExercise(formData: FormData) {
     is_custom: validated.is_custom ?? false,
   }
 
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  // Using double assertion to work around TypeScript's strict type checking
   const { data, error } = await supabase
     .from('exercises')
-    .insert(insertData)
+    .insert(insertData as unknown as ExerciseInsert)
     .select()
     .single()
 
