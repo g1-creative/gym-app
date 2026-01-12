@@ -1,13 +1,12 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function signIn(email: string, password: string) {
   const supabase = await createClient()
   
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
@@ -16,9 +15,13 @@ export async function signIn(email: string, password: string) {
     return { error: error.message }
   }
   
-  // Revalidate to ensure fresh data
-  revalidatePath('/', 'layout')
-  redirect('/')
+  if (data.session) {
+    // Revalidate to ensure fresh data
+    revalidatePath('/', 'layout')
+    return { success: true }
+  }
+  
+  return { error: 'Failed to create session' }
 }
 
 export async function signUp(email: string, password: string) {
@@ -36,9 +39,10 @@ export async function signUp(email: string, password: string) {
   // If email confirmation is disabled, user is automatically signed in
   if (data.user && data.session) {
     revalidatePath('/', 'layout')
-    redirect('/')
+    return { success: true }
   }
   
-  return { success: true, message: 'Please check your email to confirm your account.' }
+  // Email confirmation is required
+  return { success: true, requiresConfirmation: true, message: 'Please check your email to confirm your account.' }
 }
 

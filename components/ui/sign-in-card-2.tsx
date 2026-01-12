@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { signIn, signUp } from '@/app/actions/auth';
@@ -25,6 +26,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export function Component() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,15 +73,18 @@ export function Component() {
         if (result?.error) {
           setError(result.error);
           setIsLoading(false);
-        } else if (result?.success) {
+        } else if (result?.requiresConfirmation) {
           // Email confirmation is enabled
           setError(null);
           alert(result.message);
           setIsSignUp(false); // Switch back to sign in
           setIsLoading(false);
-        } else {
-          // Redirect happened (no return value)
-          // Loading state will be reset on unmount
+        } else if (result?.success) {
+          // Successfully signed up and logged in
+          router.refresh();
+          // Small delay to ensure cookies are set
+          await new Promise(resolve => setTimeout(resolve, 100));
+          window.location.href = '/';
         }
       } else {
         const result = await signIn(email, password);
@@ -87,17 +92,15 @@ export function Component() {
         if (result?.error) {
           setError(result.error);
           setIsLoading(false);
-        } else {
-          // Redirect happened (no return value)
-          // Loading state will be reset on unmount
+        } else if (result?.success) {
+          // Successfully signed in
+          router.refresh();
+          // Small delay to ensure cookies are set
+          await new Promise(resolve => setTimeout(resolve, 100));
+          window.location.href = '/';
         }
       }
     } catch (err: any) {
-      // Next.js redirect() throws a special error - ignore it
-      if (err.message?.includes('NEXT_REDIRECT') || err.digest === 'NEXT_REDIRECT') {
-        // Redirect is happening, don't show error
-        return;
-      }
       setError(err.message || 'An error occurred');
       setIsLoading(false);
     }
