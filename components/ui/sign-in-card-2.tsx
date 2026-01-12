@@ -4,7 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { signIn, signUp } from '@/app/actions/auth';
 
 import { cn } from "@/lib/utils"
 
@@ -25,6 +26,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export function Component() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -67,92 +69,35 @@ export function Component() {
 
     try {
       if (isSignUp) {
-        console.log('[CLIENT] Calling signUp via Supabase client...');
-        const supabase = createClient();
+        console.log('[CLIENT] Calling signUp server action...');
+        const result = await signUp(email, password);
         
-        const { data, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        
-        console.log('[CLIENT] signUp result:', { 
-          hasSession: !!data.session, 
-          hasUser: !!data.user,
-          error: authError?.message 
-        });
-        
-        if (authError) {
-          console.log('[CLIENT] signUp error:', authError.message);
-          setError(authError.message);
+        if (result.error) {
+          console.log('[CLIENT] signUp error:', result.error);
+          setError(result.error);
           setIsLoading(false);
-        } else if (data.user && data.session) {
-          console.log('[CLIENT] signUp success with session');
-          
-          // Force cookie refresh by calling getSession
-          const { data: { session } } = await supabase.auth.getSession();
-          console.log('[CLIENT] Session confirmed after getSession:', !!session);
-          
-          // Wait longer for cookies to be written
-          console.log('[CLIENT] Waiting for cookies to propagate...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          console.log('[CLIENT] Redirecting to home page...');
-          window.location.replace('/');
-        } else if (data.user && !data.session) {
+        } else if (result.requiresConfirmation) {
           console.log('[CLIENT] signUp requires email confirmation');
-          setError(null);
-          alert('Please check your email to confirm your account.');
-          setIsSignUp(false); // Switch back to sign in
+          alert(result.message);
+          setIsSignUp(false);
           setIsLoading(false);
         } else {
-          console.log('[CLIENT] signUp completed but no user created');
-          setError('Failed to create account');
-          setIsLoading(false);
+          console.log('[CLIENT] signUp success, redirecting...');
+          router.push('/');
+          router.refresh();
         }
       } else {
-        console.log('[CLIENT] Calling signIn via Supabase client...');
-        const supabase = createClient();
+        console.log('[CLIENT] Calling signIn server action...');
+        const result = await signIn(email, password);
         
-        const { data, error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        console.log('[CLIENT] signIn result:', { 
-          hasSession: !!data.session, 
-          hasUser: !!data.user,
-          error: authError?.message 
-        });
-        
-        if (authError) {
-          console.log('[CLIENT] signIn error:', authError.message);
-          setError(authError.message);
+        if (result.error) {
+          console.log('[CLIENT] signIn error:', result.error);
+          setError(result.error);
           setIsLoading(false);
-        } else if (data.session) {
-          console.log('[CLIENT] signIn success with session');
-          console.log('[CLIENT] Session token:', data.session.access_token.substring(0, 20) + '...');
-          
-          // Force cookie refresh by calling getSession
-          const { data: { session } } = await supabase.auth.getSession();
-          console.log('[CLIENT] Session confirmed after getSession:', !!session);
-          
-          // Wait longer for cookies to be written
-          console.log('[CLIENT] Waiting for cookies to propagate...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Check if auth cookies exist
-          const cookies = document.cookie;
-          console.log('[CLIENT] Current cookies:', cookies.split(';').map(c => c.trim().split('=')[0]));
-          const hasAuthCookie = cookies.includes('sb-') || cookies.includes('supabase');
-          console.log('[CLIENT] Has Supabase auth cookie:', hasAuthCookie);
-          
-          console.log('[CLIENT] Redirecting to home page...');
-          // Use replace to avoid back button issues
-          window.location.replace('/');
         } else {
-          console.log('[CLIENT] signIn completed but no session created');
-          setError('Failed to create session');
-          setIsLoading(false);
+          console.log('[CLIENT] signIn success, redirecting...');
+          router.push('/');
+          router.refresh();
         }
       }
     } catch (err: any) {
