@@ -1,13 +1,38 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import type { Database } from '@/types/database'
 
 export async function POST(request: Request) {
   try {
     console.log('[API] signUp POST request received')
     const { email, password } = await request.json()
     
-    console.log('[API] Creating Supabase client')
-    const supabase = await createClient()
+    const cookieStore = await cookies()
+    const response = NextResponse.json({ success: false })
+    
+    console.log('[API] Creating Supabase client with cookie handling')
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options)
+                response.cookies.set(name, value, options)
+              })
+            } catch (error) {
+              console.error('[API] Error setting cookies:', error)
+            }
+          },
+        },
+      }
+    )
     
     console.log('[API] Calling signUp for:', email)
     const { data, error } = await supabase.auth.signUp({
@@ -28,8 +53,11 @@ export async function POST(request: Request) {
     
     // If email confirmation is disabled, user is automatically signed in
     if (data.user && data.session) {
-      console.log('[API] signUp success with session')
-      return NextResponse.json({ success: true })
+      console.log('[API] signUp success with session, returning with cookies')
+      return NextResponse.json({ success: true }, {
+        status: 200,
+        headers: response.headers,
+      })
     }
     
     // Email confirmation is required

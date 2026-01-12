@@ -95,7 +95,9 @@ export function Component() {
         return;
       }
       
-      console.log('[CLIENT] Auth successful, redirecting to home');
+      console.log('[CLIENT] Auth successful, waiting for cookies then redirecting');
+      // Wait a moment for cookies to be set by browser
+      await new Promise(resolve => setTimeout(resolve, 100));
       // Use window.location for a hard redirect after successful auth
       window.location.href = '/';
     } catch (err: any) {
