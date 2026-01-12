@@ -28,7 +28,7 @@ export default async function ProgramsPage() {
 
         {programs && programs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {programs.map((program) => (
+            {programs.map((program: any) => (
               <Link
                 key={program.id}
                 href={`/programs/${program.id}`}

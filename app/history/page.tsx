@@ -28,7 +28,7 @@ export default async function HistoryPage() {
 
         {sessions && sessions.length > 0 ? (
           <div className="space-y-3">
-            {sessions.map((session) => (
+            {sessions.map((session: any) => (
               <Link
                 key={session.id}
                 href={`/workout/${session.id}`}

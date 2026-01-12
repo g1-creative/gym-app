@@ -36,8 +36,9 @@ export async function logSet(input: SetInput & { sessionId: string; exerciseId: 
   if (!session) throw new Error('Session not found')
 
   // Get next set number
-  const { data: existingSets } = await supabase
-    .from('sets')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const selectQuery = supabase.from('sets') as any
+  const result = await selectQuery
     .select('set_number')
     .eq('session_id', input.sessionId)
     .eq('exercise_id', input.exerciseId)
@@ -45,6 +46,7 @@ export async function logSet(input: SetInput & { sessionId: string; exerciseId: 
     .order('set_number', { ascending: false })
     .limit(1)
 
+  const existingSets = result.data as { set_number: number }[] | null
   const setNumber = existingSets && existingSets.length > 0 ? existingSets[0].set_number + 1 : 1
 
   const validated = setSchema.parse({
@@ -83,22 +85,24 @@ export async function updateSet(id: string, input: Partial<SetInput>) {
   if (!user) throw new Error('Unauthorized')
 
   // Verify set belongs to user's session
-  const { data: set } = await supabase
-    .from('sets')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const selectQuery = supabase.from('sets') as any
+  const selectResult = await selectQuery
     .select('session_id, workout_sessions!inner(user_id)')
     .eq('id', id)
     .is('deleted_at', null)
     .single()
 
-  if (!set || (set.workout_sessions as any).user_id !== user.id) {
+  const set = selectResult.data as { session_id: string; workout_sessions: { user_id: string } } | null
+  if (!set || set.workout_sessions.user_id !== user.id) {
     throw new Error('Set not found')
   }
 
   const validated = setSchema.partial().parse(input)
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const query = supabase.from('sets') as any
-  const { data, error } = await query
+  const updateQuery = supabase.from('sets') as any
+  const { data, error } = await updateQuery
     .update(validated)
     .eq('id', id)
     .select(`
@@ -120,20 +124,22 @@ export async function deleteSet(id: string) {
   if (!user) throw new Error('Unauthorized')
 
   // Verify set belongs to user's session
-  const { data: set } = await supabase
-    .from('sets')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const selectQuery = supabase.from('sets') as any
+  const selectResult = await selectQuery
     .select('session_id, workout_sessions!inner(user_id)')
     .eq('id', id)
     .is('deleted_at', null)
     .single()
 
-  if (!set || (set.workout_sessions as any).user_id !== user.id) {
+  const set = selectResult.data as { session_id: string; workout_sessions: { user_id: string } } | null
+  if (!set || set.workout_sessions.user_id !== user.id) {
     throw new Error('Set not found')
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const query = supabase.from('sets') as any
-  const { error } = await query
+  const updateQuery = supabase.from('sets') as any
+  const { error } = await updateQuery
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
 

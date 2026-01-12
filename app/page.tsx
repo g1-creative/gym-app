@@ -69,7 +69,7 @@ export default async function HomePage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">Recent Workouts</h2>
             <div className="space-y-3">
-              {recentSessions.map((session) => (
+              {recentSessions.map((session: any) => (
                 <Link
                   key={session.id}
                   href={`/workout/${session.id}`}

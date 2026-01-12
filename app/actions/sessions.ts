@@ -107,8 +107,9 @@ export async function getActiveSession() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data, error } = await supabase
-    .from('workout_sessions')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workout_sessions') as any
+  const result = await query
     .select(`
       *,
       sets(
@@ -125,6 +126,7 @@ export async function getActiveSession() {
     .limit(1)
     .maybeSingle()
 
+  const { data, error } = result
   if (error) throw error
   return data
 }
@@ -135,8 +137,9 @@ export async function getSession(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data, error } = await supabase
-    .from('workout_sessions')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workout_sessions') as any
+  const result = await query
     .select(`
       *,
       sets(
@@ -151,6 +154,7 @@ export async function getSession(id: string) {
     .is('deleted_at', null)
     .single()
 
+  const { data, error } = result
   if (error) throw error
   return data
 }
@@ -161,8 +165,9 @@ export async function getSessions(limit = 50) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data, error } = await supabase
-    .from('workout_sessions')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workout_sessions') as any
+  const result = await query
     .select(`
       *,
       program:programs(name),
@@ -173,6 +178,7 @@ export async function getSessions(limit = 50) {
     .order('started_at', { ascending: false })
     .limit(limit)
 
+  const { data, error } = result
   if (error) throw error
   return data
 }

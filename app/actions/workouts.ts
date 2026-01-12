@@ -68,20 +68,22 @@ export async function updateWorkout(id: string, formData: FormData) {
   const validated = workoutSchema.partial().parse(rawData)
 
   // Verify workout belongs to user's program
-  const { data: workout } = await supabase
-    .from('workouts')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const selectQuery = supabase.from('workouts') as any
+  const selectResult = await selectQuery
     .select('program_id, programs!inner(user_id)')
     .eq('id', id)
     .is('deleted_at', null)
     .single()
 
-  if (!workout || (workout.programs as any).user_id !== user.id) {
+  const workout = selectResult.data as { program_id: string; programs: { user_id: string } } | null
+  if (!workout || workout.programs.user_id !== user.id) {
     throw new Error('Workout not found')
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const query = supabase.from('workouts') as any
-  const { data, error } = await query
+  const updateQuery = supabase.from('workouts') as any
+  const { data, error } = await updateQuery
     .update(validated)
     .eq('id', id)
     .select()
@@ -99,19 +101,21 @@ export async function deleteWorkout(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data: workout } = await supabase
-    .from('workouts')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const selectQuery = supabase.from('workouts') as any
+  const selectResult = await selectQuery
     .select('program_id, programs!inner(user_id)')
     .eq('id', id)
     .single()
 
-  if (!workout || (workout.programs as any).user_id !== user.id) {
+  const workout = selectResult.data as { program_id: string; programs: { user_id: string } } | null
+  if (!workout || workout.programs.user_id !== user.id) {
     throw new Error('Workout not found')
   }
 
   // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const query = supabase.from('workouts') as any
-  const { error } = await query
+  const updateQuery = supabase.from('workouts') as any
+  const { error } = await updateQuery
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
 
@@ -126,8 +130,9 @@ export async function getWorkout(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  const { data, error } = await supabase
-    .from('workouts')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workouts') as any
+  const result = await query
     .select(`
       *,
       programs!inner(user_id),
@@ -140,6 +145,7 @@ export async function getWorkout(id: string) {
     .is('deleted_at', null)
     .single()
 
+  const { data, error } = result
   if (error) throw error
 
   // Verify ownership
