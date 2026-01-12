@@ -5,34 +5,49 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function signIn(email: string, password: string) {
-  console.log('[SERVER] signIn called with email:', email)
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-  
-  console.log('[SERVER] signIn result:', { 
-    hasSession: !!data.session, 
-    hasUser: !!data.user,
-    error: error?.message 
-  })
-  
-  if (error) {
-    console.log('[SERVER] signIn error:', error.message)
-    return { error: error.message }
+  try {
+    console.log('[SERVER] signIn called with email:', email)
+    const supabase = await createClient()
+    console.log('[SERVER] Supabase client created')
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    
+    console.log('[SERVER] signIn result:', { 
+      hasSession: !!data.session, 
+      hasUser: !!data.user,
+      error: error?.message 
+    })
+    
+    if (error) {
+      console.log('[SERVER] signIn error:', error.message)
+      return { error: error.message }
+    }
+    
+    if (data.session) {
+      console.log('[SERVER] signIn success, revalidating and redirecting')
+      try {
+        revalidatePath('/', 'layout')
+        console.log('[SERVER] Revalidation complete')
+      } catch (revalidateError) {
+        console.error('[SERVER] Revalidation error:', revalidateError)
+      }
+      redirect('/')
+    }
+    
+    console.log('[SERVER] signIn failed - no session created')
+    return { error: 'Failed to create session' }
+  } catch (error: any) {
+    // redirect() throws an error which is expected - re-throw it
+    if (error.message?.includes('NEXT_REDIRECT')) {
+      console.log('[SERVER] Redirect thrown (expected)')
+      throw error
+    }
+    console.error('[SERVER] Unexpected error in signIn:', error)
+    return { error: error.message || 'An unexpected error occurred' }
   }
-  
-  if (data.session) {
-    console.log('[SERVER] signIn success, redirecting to /')
-    // Revalidate to ensure fresh data
-    revalidatePath('/', 'layout')
-    redirect('/')
-  }
-  
-  console.log('[SERVER] signIn failed - no session created')
-  return { error: 'Failed to create session' }
 }
 
 export async function signUp(email: string, password: string) {

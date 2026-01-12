@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { signIn, signUp } from '@/app/actions/auth';
 
 import { cn } from "@/lib/utils"
 
@@ -68,40 +67,38 @@ export function Component() {
     setError(null);
 
     try {
-      if (isSignUp) {
-        console.log('[CLIENT] Calling signUp server action...');
-        const result = await signUp(email, password);
-        
-        // If we get here, redirect didn't happen (means no session was created)
-        if (result.error) {
-          console.log('[CLIENT] signUp error:', result.error);
-          setError(result.error);
-          setIsLoading(false);
-        } else if (result.requiresConfirmation) {
-          console.log('[CLIENT] signUp requires email confirmation');
-          alert(result.message);
-          setIsSignUp(false);
-          setIsLoading(false);
-        }
-        // Note: if signUp succeeds with session, redirect() is called and we never reach here
-      } else {
-        console.log('[CLIENT] Calling signIn server action...');
-        const result = await signIn(email, password);
-        
-        // If we get here, redirect didn't happen (means error occurred)
-        if (result?.error) {
-          console.log('[CLIENT] signIn error:', result.error);
-          setError(result.error);
-          setIsLoading(false);
-        }
-        // Note: if signIn succeeds, redirect() is called and we never reach here
-      }
-    } catch (err: any) {
-      // redirect() throws a NEXT_REDIRECT error which is normal - don't show it as error
-      if (err.message?.includes('NEXT_REDIRECT')) {
-        console.log('[CLIENT] Redirecting...');
+      const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
+      console.log('[CLIENT] Calling API:', endpoint);
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      console.log('[CLIENT] API response status:', response.status);
+      const result = await response.json();
+      console.log('[CLIENT] API result:', result);
+      
+      if (!response.ok || result.error) {
+        console.log('[CLIENT] Error:', result.error);
+        setError(result.error || 'Authentication failed');
+        setIsLoading(false);
         return;
       }
+      
+      if (result.requiresConfirmation) {
+        console.log('[CLIENT] Email confirmation required');
+        alert(result.message || 'Please check your email to confirm your account.');
+        setIsSignUp(false);
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log('[CLIENT] Auth successful, redirecting to home');
+      // Use window.location for a hard redirect after successful auth
+      window.location.href = '/';
+    } catch (err: any) {
       console.error('[CLIENT] Exception during auth:', err);
       setError(err.message || 'An error occurred');
       setIsLoading(false);
