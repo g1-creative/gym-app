@@ -70,17 +70,24 @@ export function Component() {
 
     try {
       if (isSignUp) {
-        const { error: authError } = await supabase.auth.signUp({
+        const { data: signUpData, error: authError } = await supabase.auth.signUp({
           email,
           password,
         });
         
         if (authError) throw authError;
         
-        // Show success message
-        setError(null);
-        alert('Account created! Please check your email to confirm your account.');
-        setIsSignUp(false); // Switch back to sign in
+        // If user is automatically signed in (email confirmation disabled), redirect
+        if (signUpData.user && signUpData.session) {
+          // Email confirmation is disabled - user is automatically signed in
+          router.push('/');
+          router.refresh();
+        } else {
+          // Email confirmation is enabled - show message
+          setError(null);
+          alert('Account created! Please check your email to confirm your account.');
+          setIsSignUp(false); // Switch back to sign in
+        }
       } else {
         const { error: authError } = await supabase.auth.signInWithPassword({
           email,
