@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function signIn(email: string, password: string) {
   console.log('[SERVER] signIn called with email:', email)
@@ -24,10 +25,10 @@ export async function signIn(email: string, password: string) {
   }
   
   if (data.session) {
-    console.log('[SERVER] signIn success, session created')
+    console.log('[SERVER] signIn success, redirecting to /')
     // Revalidate to ensure fresh data
     revalidatePath('/', 'layout')
-    return { success: true }
+    redirect('/')
   }
   
   console.log('[SERVER] signIn failed - no session created')
@@ -56,9 +57,9 @@ export async function signUp(email: string, password: string) {
   
   // If email confirmation is disabled, user is automatically signed in
   if (data.user && data.session) {
-    console.log('[SERVER] signUp success with session')
+    console.log('[SERVER] signUp success with session, redirecting to /')
     revalidatePath('/', 'layout')
-    return { success: true }
+    redirect('/')
   }
   
   // Email confirmation is required

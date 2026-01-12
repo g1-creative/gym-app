@@ -72,6 +72,7 @@ export function Component() {
         console.log('[CLIENT] Calling signUp server action...');
         const result = await signUp(email, password);
         
+        // If we get here, redirect didn't happen (means no session was created)
         if (result.error) {
           console.log('[CLIENT] signUp error:', result.error);
           setError(result.error);
@@ -81,26 +82,26 @@ export function Component() {
           alert(result.message);
           setIsSignUp(false);
           setIsLoading(false);
-        } else {
-          console.log('[CLIENT] signUp success, redirecting...');
-          router.push('/');
-          router.refresh();
         }
+        // Note: if signUp succeeds with session, redirect() is called and we never reach here
       } else {
         console.log('[CLIENT] Calling signIn server action...');
         const result = await signIn(email, password);
         
-        if (result.error) {
+        // If we get here, redirect didn't happen (means error occurred)
+        if (result?.error) {
           console.log('[CLIENT] signIn error:', result.error);
           setError(result.error);
           setIsLoading(false);
-        } else {
-          console.log('[CLIENT] signIn success, redirecting...');
-          router.push('/');
-          router.refresh();
         }
+        // Note: if signIn succeeds, redirect() is called and we never reach here
       }
     } catch (err: any) {
+      // redirect() throws a NEXT_REDIRECT error which is normal - don't show it as error
+      if (err.message?.includes('NEXT_REDIRECT')) {
+        console.log('[CLIENT] Redirecting...');
+        return;
+      }
       console.error('[CLIENT] Exception during auth:', err);
       setError(err.message || 'An error occurred');
       setIsLoading(false);
