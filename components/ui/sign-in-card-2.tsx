@@ -77,18 +77,27 @@ export function Component() {
           alert(result.message);
           setIsSignUp(false); // Switch back to sign in
           setIsLoading(false);
+        } else {
+          // Redirect happened (no return value)
+          // Loading state will be reset on unmount
         }
-        // If redirect happens, this code won't run
       } else {
         const result = await signIn(email, password);
         
         if (result?.error) {
           setError(result.error);
           setIsLoading(false);
+        } else {
+          // Redirect happened (no return value)
+          // Loading state will be reset on unmount
         }
-        // If redirect happens, this code won't run
       }
     } catch (err: any) {
+      // Next.js redirect() throws a special error - ignore it
+      if (err.message?.includes('NEXT_REDIRECT') || err.digest === 'NEXT_REDIRECT') {
+        // Redirect is happening, don't show error
+        return;
+      }
       setError(err.message || 'An error occurred');
       setIsLoading(false);
     }
