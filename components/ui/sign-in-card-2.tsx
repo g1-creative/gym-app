@@ -80,7 +80,11 @@ export function Component() {
         // If user is automatically signed in (email confirmation disabled), redirect
         if (signUpData.user && signUpData.session) {
           // Email confirmation is disabled - user is automatically signed in
-          window.location.href = '/';
+          // Refresh the router to pick up the new session, then redirect
+          router.refresh();
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 200);
         } else {
           // Email confirmation is enabled - show message
           setError(null);
@@ -95,14 +99,16 @@ export function Component() {
         
         if (authError) throw authError;
         
-        // Wait a moment for session to be established, then redirect
         if (signInData.session) {
-          // Use window.location for a hard redirect to ensure session is picked up
-          window.location.href = '/';
-        } else {
-          // Fallback to router if session not immediately available
-          router.push('/');
+          // Refresh the router to pick up the new session, then redirect
           router.refresh();
+          // Use a small delay and then redirect to ensure session is recognized
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 200);
+        } else {
+          setError('Session not created. Please try again.');
+          setIsLoading(false);
         }
       }
     } catch (err: any) {
