@@ -33,21 +33,30 @@ export function Component() {
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const router = useRouter();
 
-  // For 3D card effect - increased rotation range for more pronounced 3D effect
+  // Detect touch device on mount
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  // For 3D card effect - only on non-touch devices
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const rotateX = useTransform(mouseY, [-300, 300], [10, -10]); // Increased from 5/-5 to 10/-10
-  const rotateY = useTransform(mouseX, [-300, 300], [-10, 10]); // Increased from -5/5 to -10/10
+  const rotateX = useTransform(mouseY, [-300, 300], [10, -10]);
+  const rotateY = useTransform(mouseX, [-300, 300], [-10, 10]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (isTouchDevice) return; // Disable on touch devices
     const rect = e.currentTarget.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left - rect.width / 2);
     mouseY.set(e.clientY - rect.top - rect.height / 2);
   };
 
   const handleMouseLeave = () => {
+    if (isTouchDevice) return; // Disable on touch devices
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -60,15 +69,29 @@ export function Component() {
     const supabase = createClient();
 
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (authError) throw authError;
-      
-      router.push('/');
-      router.refresh();
+      if (isSignUp) {
+        const { error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        if (authError) throw authError;
+        
+        // Show success message
+        setError(null);
+        alert('Account created! Please check your email to confirm your account.');
+        setIsSignUp(false); // Switch back to sign in
+      } else {
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (authError) throw authError;
+        
+        router.push('/');
+        router.refresh();
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
       setIsLoading(false);
@@ -573,7 +596,7 @@ export function Component() {
                             exit={{ opacity: 0 }}
                             className="flex items-center justify-center gap-1 text-sm font-medium"
                           >
-                            Sign In
+                            {isSignUp ? 'Sign Up' : 'Sign In'}
                             <ArrowRight className="w-3 h-3 group-hover/button:translate-x-1 transition-transform duration-300" />
                           </motion.span>
                         )}
@@ -625,23 +648,27 @@ export function Component() {
                     </div>
                   </motion.button>
 
-                {/* Sign up link */}
+                {/* Sign up / Sign in toggle link */}
                 <motion.p 
                   className="text-center text-xs text-white/60 mt-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  Don't have an account?{' '}
-                  <Link 
-                    href="/signup" 
+                  {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(!isSignUp);
+                      setError(null);
+                    }}
                     className="relative inline-block group/signup"
                   >
                     <span className="relative z-10 text-white group-hover/signup:text-white/70 transition-colors duration-300 font-medium">
-                      Sign up
+                      {isSignUp ? 'Sign in' : 'Sign up'}
                     </span>
                     <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white group-hover/signup:w-full transition-all duration-300" />
-                  </Link>
+                  </button>
                 </motion.p>
               </form>
             </div>
