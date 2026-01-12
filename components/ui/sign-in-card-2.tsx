@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { signIn, signUp } from '@/app/actions/auth';
+import { createClient } from '@/lib/supabase/client';
 
 import { cn } from "@/lib/utils"
 
@@ -85,8 +86,29 @@ export function Component() {
           setIsSignUp(false); // Switch back to sign in
           setIsLoading(false);
         } else if (result?.success) {
-          console.log('[CLIENT] signUp success, redirecting...');
-          // Successfully signed up and logged in - force a full page reload
+          console.log('[CLIENT] signUp success, verifying session...');
+          
+          // Verify session is set before redirecting
+          const supabase = createClient();
+          let retries = 0;
+          const maxRetries = 5;
+          
+          while (retries < maxRetries) {
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log(`[CLIENT] Session check attempt ${retries + 1}:`, !!session);
+            
+            if (session) {
+              console.log('[CLIENT] Session verified, redirecting to home...');
+              window.location.replace('/');
+              return;
+            }
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 300));
+            retries++;
+          }
+          
+          console.log('[CLIENT] Session not verified after retries, forcing redirect anyway...');
           window.location.replace('/');
         }
       } else {
@@ -99,8 +121,29 @@ export function Component() {
           setError(result.error);
           setIsLoading(false);
         } else if (result?.success) {
-          console.log('[CLIENT] signIn success, redirecting to home...');
-          // Successfully signed in - force a full page reload
+          console.log('[CLIENT] signIn success, verifying session...');
+          
+          // Verify session is set before redirecting
+          const supabase = createClient();
+          let retries = 0;
+          const maxRetries = 5;
+          
+          while (retries < maxRetries) {
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log(`[CLIENT] Session check attempt ${retries + 1}:`, !!session);
+            
+            if (session) {
+              console.log('[CLIENT] Session verified, redirecting to home...');
+              window.location.replace('/');
+              return;
+            }
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 300));
+            retries++;
+          }
+          
+          console.log('[CLIENT] Session not verified after retries, forcing redirect anyway...');
           window.location.replace('/');
         } else {
           console.log('[CLIENT] signIn unexpected result:', result);

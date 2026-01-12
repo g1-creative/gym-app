@@ -11,14 +11,19 @@ export async function createClient() {
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          const allCookies = cookieStore.getAll()
+          console.log('[SERVER COOKIES] getAll called, count:', allCookies.length)
+          return allCookies
         },
         setAll(cookiesToSet: any) {
           try {
-            cookiesToSet.forEach(({ name, value, options }: any) =>
+            console.log('[SERVER COOKIES] setAll called, setting', cookiesToSet.length, 'cookies')
+            cookiesToSet.forEach(({ name, value, options }: any) => {
+              console.log('[SERVER COOKIES] Setting cookie:', name, 'with options:', options)
               cookieStore.set(name, value, options)
-            )
-          } catch {
+            })
+          } catch (error) {
+            console.error('[SERVER COOKIES] Error setting cookies:', error)
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
