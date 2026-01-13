@@ -30,6 +30,7 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
   const [restTimerSeconds, setRestTimerSeconds] = useState(90)
   const [isPending, startTransition] = useTransition()
   const [workoutSessions, setWorkoutSessions] = useState<Record<string, any[]>>({})
+  const [workoutDayNumbers, setWorkoutDayNumbers] = useState<Record<string, number>>({})
   const [expandedWorkouts, setExpandedWorkouts] = useState<Record<string, boolean>>({})
   const router = useRouter()
 
