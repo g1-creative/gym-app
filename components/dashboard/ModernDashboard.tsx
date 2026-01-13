@@ -81,7 +81,11 @@ export default function ModernDashboard({
 
     const init = () => {
       ps = [];
-      const count = Math.floor((canvas.width * canvas.height) / 12000);
+      // Optimize particle count for smaller screens (390px width)
+      const screenArea = canvas.width * canvas.height;
+      const count = screenArea < 400000 ? 
+        Math.floor(screenArea / 15000) : // Fewer particles on small screens
+        Math.floor(screenArea / 12000);
       for (let i = 0; i < count; i++) ps.push(make());
     };
 
@@ -135,6 +139,21 @@ export default function ModernDashboard({
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+
+        /* Optimizations for 390px width screens */
+        @media (max-width: 390px) {
+          .stat-card {
+            padding: 0.625rem !important;
+          }
+          
+          .action-card {
+            padding: 0.75rem !important;
+          }
+          
+          .active-workout-card {
+            padding: 0.875rem !important;
           }
         }
 
@@ -200,17 +219,17 @@ export default function ModernDashboard({
       <div className="fixed inset-0 pointer-events-none [background:radial-gradient(80%_60%_at_50%_30%,rgba(255,255,255,0.04),transparent_70%)]" />
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-6 max-w-lg pb-28">
+      <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-lg pb-24 sm:pb-28">
         {/* Header */}
-        <header className="mb-6 dashboard-animate">
-          <div className="flex items-center gap-2 mb-2">
-            <Dumbbell className="h-6 w-6 text-zinc-400" />
-            <span className="text-xs tracking-[0.14em] uppercase text-zinc-400">
+        <header className="mb-4 sm:mb-6 dashboard-animate">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6 text-zinc-400" />
+            <span className="text-[10px] sm:text-xs tracking-[0.14em] uppercase text-zinc-400">
               Gym Tracker
             </span>
           </div>
-          <h1 className="text-3xl font-bold mb-1">{greeting}</h1>
-          <p className="text-zinc-400 text-sm">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1">{greeting}</h1>
+          <p className="text-zinc-400 text-xs sm:text-sm">
             {new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
               month: 'long', 
@@ -223,125 +242,127 @@ export default function ModernDashboard({
         {activeSession && (
           <Link
             href="/workout/active"
-            className="block mb-6 dashboard-animate"
+            className="block mb-4 sm:mb-6 dashboard-animate"
           >
-            <div className="active-workout-card rounded-2xl p-5 shadow-lg">
+            <div className="active-workout-card rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-lg">
               <div className="flex items-center justify-between relative z-10">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <PlayCircle className="h-5 w-5" />
-                    <span className="text-sm font-semibold uppercase tracking-wide">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                    <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide truncate">
                       Active Workout
                     </span>
                   </div>
-                  <h2 className="text-xl font-bold mb-1">
+                  <h2 className="text-lg sm:text-xl font-bold mb-1 truncate">
                     {activeSession.workout?.name || 'Freestyle Session'}
                   </h2>
-                  <p className="text-sm opacity-90 flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
-                    Started {new Date(activeSession.started_at).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                  <p className="text-xs sm:text-sm opacity-90 flex items-center gap-1">
+                    <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                    <span className="truncate">
+                      Started {new Date(activeSession.started_at).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
                   </p>
                 </div>
-                <ArrowRight className="h-6 w-6" />
+                <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 ml-2" />
               </div>
             </div>
           </Link>
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6 dashboard-animate">
-          <div className="stat-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Dumbbell className="h-4 w-4 text-blue-400" />
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6 dashboard-animate">
+          <div className="stat-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10">
+                <Dumbbell className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
               </div>
             </div>
-            <div className="text-2xl font-bold">{stats.totalWorkouts}</div>
-            <div className="text-xs text-zinc-400">Total Workouts</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.totalWorkouts}</div>
+            <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Workouts</div>
           </div>
 
-          <div className="stat-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 rounded-lg bg-orange-500/10">
-                <Flame className="h-4 w-4 text-orange-400" />
+          <div className="stat-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-orange-500/10">
+                <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-400" />
               </div>
             </div>
-            <div className="text-2xl font-bold">{stats.currentStreak}</div>
-            <div className="text-xs text-zinc-400">Day Streak</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.currentStreak}</div>
+            <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Day Streak</div>
           </div>
 
-          <div className="stat-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <TrendingUp className="h-4 w-4 text-green-400" />
+          <div className="stat-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/10">
+                <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-400" />
               </div>
             </div>
-            <div className="text-2xl font-bold">{stats.totalVolume.toFixed(0)}</div>
-            <div className="text-xs text-zinc-400">Total Volume (kg)</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.totalVolume.toFixed(0)}</div>
+            <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Volume (kg)</div>
           </div>
 
-          <div className="stat-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Trophy className="h-4 w-4 text-purple-400" />
+          <div className="stat-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10">
+                <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-400" />
               </div>
             </div>
-            <div className="text-2xl font-bold">{stats.weeklyWorkouts}</div>
-            <div className="text-xs text-zinc-400">This Week</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.weeklyWorkouts}</div>
+            <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">This Week</div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-6 dashboard-animate">
-          <h2 className="text-lg font-semibold mb-3 text-zinc-300">Quick Actions</h2>
-          <div className="grid grid-cols-1 gap-3">
+        <div className="mb-4 sm:mb-6 dashboard-animate">
+          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-zinc-300">Quick Actions</h2>
+          <div className="grid grid-cols-1 gap-2 sm:gap-3">
             <Link href="/workout/new" className="block">
-              <div className="action-card rounded-xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-zinc-50/10">
-                    <PlayCircle className="h-6 w-6 text-zinc-50" />
+              <div className="action-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                  <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-zinc-50/10 flex-shrink-0">
+                    <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6 text-zinc-50" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold">Start New Workout</h3>
-                    <p className="text-sm text-zinc-400">Begin your session</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-sm sm:text-base truncate">Start New Workout</h3>
+                    <p className="text-xs sm:text-sm text-zinc-400 truncate">Begin your session</p>
                   </div>
                 </div>
-                <ArrowRight className="h-5 w-5 text-zinc-400" />
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-zinc-400 flex-shrink-0 ml-2" />
               </div>
             </Link>
 
             <Link href="/programs" className="block">
-              <div className="action-card rounded-xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-blue-500/10">
-                    <FolderKanban className="h-6 w-6 text-blue-400" />
+              <div className="action-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                  <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-blue-500/10 flex-shrink-0">
+                    <FolderKanban className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold">My Programs</h3>
-                    <p className="text-sm text-zinc-400">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-sm sm:text-base truncate">My Programs</h3>
+                    <p className="text-xs sm:text-sm text-zinc-400 truncate">
                       {programs.length} {programs.length === 1 ? 'program' : 'programs'}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="h-5 w-5 text-zinc-400" />
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-zinc-400 flex-shrink-0 ml-2" />
               </div>
             </Link>
 
             <Link href="/analytics" className="block">
-              <div className="action-card rounded-xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-green-500/10">
-                    <BarChart3 className="h-6 w-6 text-green-400" />
+              <div className="action-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                  <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-green-500/10 flex-shrink-0">
+                    <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-green-400" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold">Analytics</h3>
-                    <p className="text-sm text-zinc-400">Track your progress</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-sm sm:text-base truncate">Analytics</h3>
+                    <p className="text-xs sm:text-sm text-zinc-400 truncate">Track your progress</p>
                   </div>
                 </div>
-                <ArrowRight className="h-5 w-5 text-zinc-400" />
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-zinc-400 flex-shrink-0 ml-2" />
               </div>
             </Link>
           </div>
@@ -350,30 +371,30 @@ export default function ModernDashboard({
         {/* Recent Workouts */}
         {recentSessions && recentSessions.length > 0 && (
           <div className="dashboard-animate">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-zinc-300">Recent Activity</h2>
-              <Link href="/history" className="text-sm text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <h2 className="text-base sm:text-lg font-semibold text-zinc-300">Recent Activity</h2>
+              <Link href="/history" className="text-xs sm:text-sm text-zinc-400 hover:text-zinc-200 flex items-center gap-1">
                 View All
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Link>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {recentSessions.slice(0, 3).map((session: any) => (
                 <Link
                   key={session.id}
                   href={`/workout/${session.id}`}
                   className="block"
                 >
-                  <div className="stat-card rounded-xl p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-zinc-800">
-                        <Calendar className="h-4 w-4 text-zinc-400" />
+                  <div className="stat-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div className="p-1.5 sm:p-2 rounded-lg bg-zinc-800 flex-shrink-0">
+                        <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-400" />
                       </div>
-                      <div>
-                        <h3 className="font-medium text-sm">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-medium text-xs sm:text-sm truncate">
                           {session.workout?.name || 'Freestyle Workout'}
                         </h3>
-                        <p className="text-xs text-zinc-400">
+                        <p className="text-[10px] sm:text-xs text-zinc-400 truncate">
                           {new Date(session.started_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric'
@@ -384,7 +405,7 @@ export default function ModernDashboard({
                         </p>
                       </div>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-zinc-500" />
+                    <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-500 flex-shrink-0 ml-2" />
                   </div>
                 </Link>
               ))}
