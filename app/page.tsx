@@ -10,16 +10,13 @@ export const revalidate = 0
 
 export default async function HomePage() {
   const supabase = await createClient()
+  
+  // Route protection: Check auth in page, not middleware
   const { data: { user } } = await supabase.auth.getUser()
 
-  console.log('[HOME PAGE] Rendering, hasUser:', !!user, 'userId:', user?.id)
-
   if (!user) {
-    console.log('[HOME PAGE] No user, redirecting to login')
     redirect('/login')
   }
-
-  console.log('[HOME PAGE] User authenticated, loading dashboard data')
 
   const [activeSession, recentSessions, programs] = await Promise.all([
     getActiveSession(),
