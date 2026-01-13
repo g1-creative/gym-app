@@ -210,3 +210,29 @@ export async function getSessions(limit = 50) {
   return data
 }
 
+export async function getSessionsForWorkout(workoutId: string, limit = 10) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workout_sessions') as any
+  const result = await query
+    .select(`
+      *,
+      program:programs(name),
+      workout:workouts(name)
+    `)
+    .eq('user_id', user.id)
+    .eq('workout_id', workoutId)
+    .not('completed_at', 'is', null)
+    .is('deleted_at', null)
+    .order('started_at', { ascending: false })
+    .limit(limit)
+
+  const { data, error } = result
+  if (error) throw error
+  return data || []
+}
+

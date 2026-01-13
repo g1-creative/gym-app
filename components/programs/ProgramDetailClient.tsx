@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
 import { updateProgram, deleteProgram } from '@/app/actions/programs'
 import { createWorkout, updateWorkout, deleteWorkout } from '@/app/actions/workouts'
-import { createSession } from '@/app/actions/sessions'
-import { Plus, Edit, Trash2, Play, Save, X, Calendar, Clock } from 'lucide-react'
+import { createSession, getSessionsForWorkout } from '@/app/actions/sessions'
+import { Plus, Edit, Trash2, Play, Save, X, Calendar, Clock, TrendingUp, BarChart3, ArrowRight } from 'lucide-react'
+import { formatVolume } from '@/lib/utils/weight'
+import Link from 'next/link'
 
 interface ProgramDetailClientProps {
   program: any
@@ -27,7 +29,25 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
   const [workoutDescription, setWorkoutDescription] = useState('')
   const [restTimerSeconds, setRestTimerSeconds] = useState(90)
   const [isPending, startTransition] = useTransition()
+  const [workoutSessions, setWorkoutSessions] = useState<Record<string, any[]>>({})
+  const [expandedWorkouts, setExpandedWorkouts] = useState<Record<string, boolean>>({})
   const router = useRouter()
+
+  // Load previous sessions for each workout
+  useEffect(() => {
+    workouts.forEach((workout) => {
+      getSessionsForWorkout(workout.id, 3)
+        .then((sessions) => {
+          setWorkoutSessions((prev) => ({
+            ...prev,
+            [workout.id]: sessions || []
+          }))
+        })
+        .catch((error) => {
+          console.error('Error fetching sessions for workout:', error)
+        })
+    })
+  }, [workouts])
 
   const handleSaveProgram = async () => {
     startTransition(async () => {
@@ -320,54 +340,133 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
             </div>
           ) : (
             <div className="space-y-2 sm:space-y-3">
-              {workouts.map((workout) => (
-                <div
-                  key={workout.id}
-                  className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                      <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-sm sm:text-base truncate">{workout.name}</h3>
-                        {workout.description && (
-                          <p className="text-xs sm:text-sm text-zinc-400 truncate">{workout.description}</p>
-                        )}
-                        <div className="flex items-center gap-2 mt-1">
-                          <Clock className="h-3 w-3 text-zinc-500" />
-                          <span className="text-[10px] sm:text-xs text-zinc-500">
-                            {workout.rest_timer_seconds || 90}s rest
-                          </span>
+              {workouts.map((workout) => {
+                const sessions = workoutSessions[workout.id] || []
+                const isExpanded = expandedWorkouts[workout.id] || false
+                const hasSessions = sessions.length > 0
+
+                return (
+                  <div
+                    key={workout.id}
+                    className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">{workout.name}</h3>
+                          {workout.description && (
+                            <p className="text-xs sm:text-sm text-zinc-400 truncate">{workout.description}</p>
+                          )}
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3 text-zinc-500" />
+                              <span className="text-[10px] sm:text-xs text-zinc-500">
+                                {workout.rest_timer_seconds || 90}s rest
+                              </span>
+                            </div>
+                            {hasSessions && (
+                              <>
+                                <span className="text-zinc-600">•</span>
+                                <button
+                                  onClick={() => setExpandedWorkouts((prev) => ({ ...prev, [workout.id]: !isExpanded }))}
+                                  className="text-[10px] sm:text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                                >
+                                  <BarChart3 className="h-3 w-3" />
+                                  {sessions.length} previous {sessions.length === 1 ? 'session' : 'sessions'}
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
+                      <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                        <Button
+                          onClick={() => handleStartWorkout(workout.id)}
+                          disabled={isPending}
+                          className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto bg-black hover:bg-zinc-900 text-white"
+                          title="Start this workout"
+                        >
+                          <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </Button>
+                        <Button
+                          onClick={() => startEditWorkout(workout)}
+                          variant="outline"
+                          className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+                          title="Edit workout"
+                        >
+                          <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteWorkout(workout.id)}
+                          disabled={isPending}
+                          variant="destructive"
+                          className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+                          title="Delete workout"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                      <Button
-                        onClick={() => handleStartWorkout(workout.id)}
-                        disabled={isPending}
-                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto bg-black hover:bg-zinc-900 text-white"
-                      >
-                        <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button
-                        onClick={() => startEditWorkout(workout)}
-                        variant="outline"
-                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
-                      >
-                        <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button
-                        onClick={() => handleDeleteWorkout(workout.id)}
-                        disabled={isPending}
-                        variant="destructive"
-                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
-                      >
-                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </Button>
-                    </div>
+
+                    {/* Previous Sessions */}
+                    {isExpanded && hasSessions && (
+                      <div className="mt-3 pt-3 border-t border-zinc-800 space-y-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BarChart3 className="h-3.5 w-3.5 text-zinc-400" />
+                          <span className="text-xs sm:text-sm font-medium text-zinc-300">Previous Sessions</span>
+                        </div>
+                        {sessions.map((session: any) => (
+                          <Link
+                            key={session.id}
+                            href={`/workout/${session.id}`}
+                            className="block bg-zinc-800/50 rounded-lg p-2 sm:p-3 hover:bg-zinc-800 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
+                                <Calendar className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
+                                <span className="text-xs sm:text-sm text-zinc-300">
+                                  {new Date(session.started_at).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </span>
+                                {session.duration_seconds && (
+                                  <>
+                                    <span className="text-zinc-600">•</span>
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3 text-zinc-500" />
+                                      <span className="text-[10px] sm:text-xs text-zinc-400">
+                                        {Math.floor(session.duration_seconds / 60)} min
+                                      </span>
+                                    </div>
+                                  </>
+                                )}
+                                {session.total_volume && (
+                                  <>
+                                    <span className="text-zinc-600">•</span>
+                                    <div className="flex items-center gap-1">
+                                      <TrendingUp className="h-3 w-3 text-green-400" />
+                                      <span className="text-[10px] sm:text-xs text-green-400 font-medium">
+                                        {formatVolume(session.total_volume)}
+                                      </span>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                              <ArrowRight className="h-3.5 w-3.5 text-zinc-500 flex-shrink-0" />
+                            </div>
+                          </Link>
+                        ))}
+                        <p className="text-[10px] sm:text-xs text-zinc-500 mt-2">
+                          Click to view full details and compare your progress
+                        </p>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
