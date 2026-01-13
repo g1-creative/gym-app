@@ -73,7 +73,7 @@ export async function copyPremadeProgram(programId: string) {
   formData.append('description', premadeProgram.description || '')
   formData.append('is_active', 'true')
 
-  const newProgram = await createProgram(formData)
+  const newProgram = await createProgram(formData) as { id: string; name: string; description: string | null }
 
   // Copy workouts
   const workouts = premadeProgram.workouts || []
@@ -85,7 +85,7 @@ export async function copyPremadeProgram(programId: string) {
     workoutFormData.append('order_index', workout.order_index?.toString() || '0')
     workoutFormData.append('rest_timer_seconds', workout.rest_timer_seconds?.toString() || '90')
 
-    const newWorkout = await createWorkout(workoutFormData)
+    const newWorkout = await createWorkout(workoutFormData) as { id: string; name: string; description: string | null; program_id: string }
 
     // Copy workout exercises
     const workoutExercises = workout.workout_exercises || []
