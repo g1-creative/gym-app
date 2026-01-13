@@ -30,9 +30,12 @@ export default function BottomNavDemo() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold text-foreground">With Custom Default Index</h2>
+            <h2 className="text-2xl font-semibold text-foreground">Navigation</h2>
+            <p className="text-muted-foreground">
+              The active item is automatically highlighted based on the current route. Click any item to navigate!
+            </p>
             <div className="flex justify-center">
-              <BottomNavBar defaultIndex={2} />
+              <BottomNavBar />
             </div>
           </section>
         </div>
@@ -47,12 +50,14 @@ export default function BottomNavDemo() {
             <li>Fully accessible with ARIA labels</li>
             <li>Responsive design</li>
             <li>Touch-optimized tap targets</li>
+            <li>Integrated with Next.js routing</li>
+            <li>Automatic active route detection</li>
           </ul>
         </div>
       </div>
 
       {/* Sticky Bottom Nav */}
-      <BottomNavBar stickyBottom defaultIndex={0} />
+      <BottomNavBar stickyBottom />
     </div>
   )
 }
