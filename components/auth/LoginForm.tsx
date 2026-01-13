@@ -14,6 +14,7 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('[LOGIN] Form submitted')
     setIsLoading(true)
     setError(null)
 
@@ -21,26 +22,32 @@ export function LoginForm() {
 
     try {
       if (isSignUp) {
+        console.log('[LOGIN] Signing up...')
         const { error } = await supabase.auth.signUp({
           email,
           password,
         })
         if (error) throw error
         alert('Check your email to confirm your account!')
+        setIsLoading(false)
       } else {
+        console.log('[LOGIN] Signing in...')
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
-        if (error) throw error
+        if (error) {
+          console.log('[LOGIN] Error:', error)
+          throw error
+        }
         
-        // Refresh the page to update auth state
-        router.refresh()
-        router.push('/')
+        console.log('[LOGIN] Success! Redirecting...')
+        // Use hard redirect for reliability
+        window.location.href = '/'
       }
     } catch (err: any) {
+      console.error('[LOGIN] Exception:', err)
       setError(err.message || 'An error occurred')
-    } finally {
       setIsLoading(false)
     }
   }
