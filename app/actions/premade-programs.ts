@@ -95,8 +95,9 @@ export async function copyPremadeProgram(programId: string) {
       
       if (we.exercise?.is_custom) {
         // Create custom exercise for user
-        const { data: newExercise } = await supabase
-          .from('exercises')
+        // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+        const exerciseQuery = supabase.from('exercises') as any
+        const { data: newExercise } = await exerciseQuery
           .insert({
             user_id: user.id,
             name: we.exercise.name,
@@ -114,8 +115,9 @@ export async function copyPremadeProgram(programId: string) {
 
       if (exerciseId) {
         // Create workout_exercise link
-        await supabase
-          .from('workout_exercises')
+        // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+        const workoutExerciseQuery = supabase.from('workout_exercises') as any
+        await workoutExerciseQuery
           .insert({
             workout_id: newWorkout.id,
             exercise_id: exerciseId,

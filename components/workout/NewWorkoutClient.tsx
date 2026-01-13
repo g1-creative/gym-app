@@ -210,7 +210,7 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
 
         <Button
           onClick={handleStart}
-          disabled={isPending || (selectedProgram && !selectedWorkout)}
+          disabled={isPending || (selectedProgram ? !selectedWorkout : false)}
           className="w-full text-xs sm:text-sm"
           size="lg"
         >

@@ -140,7 +140,7 @@ export function SmartPlatesCalculator({ isOpen, onClose, targetWeight, onWeightS
               <div className="bg-zinc-800/50 rounded-lg p-3">
                 <div className="text-xs text-zinc-400 mb-1">Total Weight</div>
                 <div className="text-lg font-semibold text-white">{result.total.toFixed(1)} lbs</div>
-                {result.remaining > 0.1 && (
+                {result.remaining !== undefined && result.remaining > 0.1 && (
                   <div className="text-xs text-zinc-500 mt-1">
                     (Closest match, {result.remaining.toFixed(1)} lbs difference)
                   </div>

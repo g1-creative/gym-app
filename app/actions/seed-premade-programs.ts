@@ -20,8 +20,9 @@ export async function seedPremadePrograms() {
   for (const program of PREMADE_PROGRAMS) {
     try {
       // Check if program already exists
-      const { data: existing } = await supabase
-        .from('programs')
+      // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+      const checkProgramQuery = supabase.from('programs') as any
+      const { data: existing } = await checkProgramQuery
         .select('id')
         .eq('name', program.name)
         .eq('is_premade', true)
@@ -34,8 +35,9 @@ export async function seedPremadePrograms() {
       }
 
       // Create program
-      const { data: newProgram, error: programError } = await supabase
-        .from('programs')
+      // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+      const programQuery = supabase.from('programs') as any
+      const { data: newProgram, error: programError } = await programQuery
         .insert({
           user_id: null, // Premade programs have no owner
           name: program.name,
@@ -53,8 +55,9 @@ export async function seedPremadePrograms() {
 
       // Create workouts
       for (const workout of program.workouts) {
-        const { data: newWorkout, error: workoutError } = await supabase
-          .from('workouts')
+        // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+        const workoutQuery = supabase.from('workouts') as any
+        const { data: newWorkout, error: workoutError } = await workoutQuery
           .insert({
             program_id: newProgram.id,
             name: workout.name,
@@ -76,8 +79,9 @@ export async function seedPremadePrograms() {
           let exerciseId: string | null = null
 
           // Try to find existing exercise
-          const { data: existingExercise } = await supabase
-            .from('exercises')
+          // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+          const findExerciseQuery = supabase.from('exercises') as any
+          const { data: existingExercise } = await findExerciseQuery
             .select('id')
             .eq('name', exerciseData.name)
             .eq('is_custom', exerciseData.isCustom || false)
@@ -88,8 +92,9 @@ export async function seedPremadePrograms() {
             exerciseId = existingExercise.id
           } else {
             // Create new exercise
-            const { data: newExercise, error: exerciseError } = await supabase
-              .from('exercises')
+            // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+            const exerciseQuery = supabase.from('exercises') as any
+            const { data: newExercise, error: exerciseError } = await exerciseQuery
               .insert({
                 user_id: null, // Public exercises
                 name: exerciseData.name,
@@ -110,8 +115,9 @@ export async function seedPremadePrograms() {
 
           if (exerciseId) {
             // Link exercise to workout
-            await supabase
-              .from('workout_exercises')
+            // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+            const workoutExerciseQuery = supabase.from('workout_exercises') as any
+            await workoutExerciseQuery
               .insert({
                 workout_id: newWorkout.id,
                 exercise_id: exerciseId,
