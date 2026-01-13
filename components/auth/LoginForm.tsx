@@ -26,7 +26,6 @@ export function LoginForm() {
           password,
         })
         if (error) throw error
-        // Show success message or redirect
         alert('Check your email to confirm your account!')
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -34,8 +33,10 @@ export function LoginForm() {
           password,
         })
         if (error) throw error
-        router.replace('/')
+        
+        // Refresh the page to update auth state
         router.refresh()
+        router.push('/')
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred')
@@ -101,4 +102,3 @@ export function LoginForm() {
     </form>
   )
 }
-
