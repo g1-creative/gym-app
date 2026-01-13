@@ -49,3 +49,4 @@ After disabling email confirmation:
 2. You should be automatically signed in and redirected to the home page
 3. No email confirmation message should appear
 
+

@@ -136,3 +136,4 @@ gym-tracker/
 - App-like experience
 - Push notifications ready (for rest timer alerts)
 
+

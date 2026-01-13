@@ -16,3 +16,4 @@ export default async function AnalyticsPage() {
   return <AnalyticsClient exercises={exercises} />
 }
 
+

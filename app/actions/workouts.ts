@@ -156,3 +156,33 @@ export async function getWorkout(id: string) {
   return data
 }
 
+export async function getWorkoutsForProgram(programId: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  // Verify program belongs to user
+  const { data: program } = await supabase
+    .from('programs')
+    .select('id')
+    .eq('id', programId)
+    .eq('user_id', user.id)
+    .is('deleted_at', null)
+    .single()
+
+  if (!program) throw new Error('Program not found')
+
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workouts') as any
+  const result = await query
+    .select('*')
+    .eq('program_id', programId)
+    .is('deleted_at', null)
+    .order('order_index', { ascending: true })
+
+  const { data, error } = result
+  if (error) throw error
+  return data
+}
+

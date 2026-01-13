@@ -345,3 +345,4 @@ CREATE TRIGGER update_session_volume_trigger AFTER INSERT OR UPDATE OR DELETE ON
 -- Insert default exercises (optional - can be done via app)
 -- You can add common exercises here or seed them via the app
 
+

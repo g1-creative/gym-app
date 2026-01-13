@@ -24,3 +24,4 @@ export default async function NewWorkoutPage() {
   return <NewWorkoutClient programs={programs} />
 }
 
+

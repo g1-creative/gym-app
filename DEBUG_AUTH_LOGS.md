@@ -83,3 +83,4 @@ You'll see logs prefixed with `[LOGIN PAGE]` showing:
 - Check browser cookie settings
 - Check Supabase URL/key environment variables
 
+

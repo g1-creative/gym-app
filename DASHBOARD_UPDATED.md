@@ -398,3 +398,4 @@ Your dashboard is now:
 
 **Your gym tracker now has a professional, modern dashboard that rivals top fitness apps!** 💪✨
 
+

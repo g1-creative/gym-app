@@ -113,3 +113,4 @@ All tables have Row Level Security (RLS) enabled to ensure users can only access
 - Client-side validation for better UX
 - Secure cookie handling via Supabase SSR
 
+

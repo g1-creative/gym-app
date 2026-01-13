@@ -93,3 +93,4 @@ export interface ChartDataPoint {
   estimated1RM: number | null
 }
 
+

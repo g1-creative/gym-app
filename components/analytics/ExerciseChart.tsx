@@ -64,3 +64,4 @@ export function ExerciseChart({ data, dataKey, title, color = '#0ea5e9' }: Exerc
   )
 }
 
+

@@ -81,3 +81,4 @@ AND tablename IN ('profiles', 'programs', 'workouts', 'exercises', 'workout_exer
 
 All should show `rowsecurity = true`.
 
+

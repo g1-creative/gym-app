@@ -20,3 +20,4 @@ export default async function ActiveWorkoutPage() {
   return <ActiveWorkoutClient session={session} />
 }
 
+

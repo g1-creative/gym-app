@@ -37,7 +37,7 @@ export default async function ProgramsPage() {
               href={`/programs/${program.id}`}
               className="block"
             >
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                   <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 flex-shrink-0">
                     <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
@@ -70,7 +70,7 @@ export default async function ProgramsPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="page-card rounded-lg sm:rounded-xl p-6 sm:p-8">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-6 sm:p-8">
             <p className="text-base sm:text-lg text-zinc-300 mb-3 sm:mb-4">No programs yet</p>
             <Link href="/programs/new">
               <Button className="text-sm sm:text-base">

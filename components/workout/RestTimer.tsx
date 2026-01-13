@@ -5,19 +5,28 @@ import { useEffect, useState, useRef } from 'react'
 interface RestTimerProps {
   duration: number // in seconds
   onComplete?: () => void
+  onTimeUpdate?: (secondsElapsed: number) => void
   autoStart?: boolean
 }
 
-export function RestTimer({ duration, onComplete, autoStart = false }: RestTimerProps) {
+export function RestTimer({ duration, onComplete, onTimeUpdate, autoStart = false }: RestTimerProps) {
   const [timeLeft, setTimeLeft] = useState(duration)
   const [isRunning, setIsRunning] = useState(autoStart)
   const [isComplete, setIsComplete] = useState(false)
+  const [secondsElapsed, setSecondsElapsed] = useState(0)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
+          const newTimeLeft = prev <= 1 ? 0 : prev - 1
+          const newElapsed = duration - newTimeLeft
+          setSecondsElapsed(newElapsed)
+          if (onTimeUpdate) {
+            onTimeUpdate(newElapsed)
+          }
+          
           if (prev <= 1) {
             setIsRunning(false)
             setIsComplete(true)
@@ -26,9 +35,8 @@ export function RestTimer({ duration, onComplete, autoStart = false }: RestTimer
             if ('vibrate' in navigator) {
               navigator.vibrate([200, 100, 200])
             }
-            return 0
           }
-          return prev - 1
+          return newTimeLeft
         })
       }, 1000)
     } else {
@@ -43,7 +51,7 @@ export function RestTimer({ duration, onComplete, autoStart = false }: RestTimer
         clearInterval(intervalRef.current)
       }
     }
-  }, [isRunning, timeLeft, onComplete])
+  }, [isRunning, timeLeft, onComplete, onTimeUpdate, duration])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -55,6 +63,8 @@ export function RestTimer({ duration, onComplete, autoStart = false }: RestTimer
     setTimeLeft(duration)
     setIsRunning(false)
     setIsComplete(false)
+    setSecondsElapsed(0)
+    if (onTimeUpdate) onTimeUpdate(0)
   }
 
   const start = () => {
@@ -134,4 +144,5 @@ export function RestTimer({ duration, onComplete, autoStart = false }: RestTimer
     </div>
   )
 }
+
 

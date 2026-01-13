@@ -92,3 +92,4 @@ Server Actions are great for many things, but **authentication cookie management
 
 **Best Practice**: Use client-side Supabase for authentication, use Server Actions for data mutations after authentication.
 
+

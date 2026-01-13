@@ -203,3 +203,4 @@ CREATE POLICY "Users can view own programs" ON programs
 - CDN for static assets
 - Database read replicas (if needed)
 
+
