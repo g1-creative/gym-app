@@ -46,12 +46,16 @@ export function LoginForm() {
         // Verify session is established
         const { data: { session } } = await supabase.auth.getSession()
         console.log('[LOGIN] Session exists:', !!session)
+        console.log('[LOGIN] Session token:', session?.access_token?.substring(0, 20) + '...')
         console.log('[LOGIN] Current cookies:', document.cookie.split(';').map(c => c.trim().split('=')[0]))
         
-        // Wait for cookies to be written by browser
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Wait longer for cookies to be fully written by browser
+        console.log('[LOGIN] Waiting 2 seconds for cookie propagation...')
+        await new Promise(resolve => setTimeout(resolve, 2000))
         
+        console.log('[LOGIN] Final cookies check:', document.cookie.split(';').map(c => c.trim().split('=')[0]))
         console.log('[LOGIN] Redirecting to dashboard...')
+        
         // Use hard redirect for reliability
         window.location.href = '/'
       }
