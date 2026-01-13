@@ -15,6 +15,7 @@ export default async function PremadeProgramsPage() {
 
   // Try to auto-seed if no programs exist
   let premadePrograms = []
+  let seedError: string | null = null
   try {
     premadePrograms = await getPremadePrograms()
     
@@ -24,10 +25,13 @@ export default async function PremadeProgramsPage() {
       if (seedResult.seeded) {
         // Re-fetch after seeding
         premadePrograms = await getPremadePrograms()
+      } else if (seedResult.message) {
+        seedError = seedResult.message
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error loading premade programs:', error)
+    seedError = error.message || 'Unknown error occurred'
     // Continue with empty array
   }
 
@@ -36,7 +40,7 @@ export default async function PremadeProgramsPage() {
       title="Premade Programs"
       subtitle={premadePrograms.length > 0 ? `${premadePrograms.length} ${premadePrograms.length === 1 ? 'program' : 'programs'} available` : 'No premade programs available'}
     >
-      <PremadeProgramsClient programs={premadePrograms} />
+      <PremadeProgramsClient programs={premadePrograms} seedError={seedError} />
     </PageLayout>
   )
 }

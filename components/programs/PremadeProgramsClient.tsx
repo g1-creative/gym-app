@@ -9,9 +9,10 @@ import Link from 'next/link'
 
 interface PremadeProgramsClientProps {
   programs: any[]
+  seedError?: string | null
 }
 
-export function PremadeProgramsClient({ programs }: PremadeProgramsClientProps) {
+export function PremadeProgramsClient({ programs, seedError }: PremadeProgramsClientProps) {
   const [copiedPrograms, setCopiedPrograms] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -41,12 +42,21 @@ export function PremadeProgramsClient({ programs }: PremadeProgramsClientProps) 
             <p>
               The premade programs are hardcoded in the app but need to be added to the database.
             </p>
+            {seedError && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-left mt-4">
+                <p className="text-xs text-red-400 font-semibold mb-1">Error:</p>
+                <p className="text-xs text-red-300">{seedError}</p>
+              </div>
+            )}
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-left mt-4">
               <p className="text-xs text-blue-400 font-semibold mb-2">Setup Required:</p>
               <ol className="text-xs text-zinc-400 space-y-1 list-decimal list-inside">
-                <li>Run the database migration (add is_premade column) - See PREMADE_PROGRAMS_SETUP.md</li>
+                <li>Run the database migration SQL in Supabase SQL editor (see migration file)</li>
                 <li>Programs will auto-seed when you visit this page, or manually seed at /admin/seed-programs</li>
               </ol>
+              <p className="text-xs text-zinc-500 mt-2">
+                <strong>Note:</strong> The migration makes user_id nullable and adds RLS policies for premade programs.
+              </p>
             </div>
           </div>
           <div className="flex gap-2 justify-center flex-wrap">
