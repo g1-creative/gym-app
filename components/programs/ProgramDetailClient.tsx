@@ -354,6 +354,7 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
             <div className="space-y-2 sm:space-y-3">
               {workouts.map((workout) => {
                 const sessions = workoutSessions[workout.id] || []
+                const dayNumber = workoutDayNumbers[workout.id]
                 const isExpanded = expandedWorkouts[workout.id] || false
                 const hasSessions = sessions.length > 0
 
