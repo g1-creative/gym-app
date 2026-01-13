@@ -30,20 +30,24 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
   const [isEditingNotes, setIsEditingNotes] = useState(false)
   const [sessionNotes, setSessionNotes] = useState(session.notes || '')
   const [isOnline, setIsOnline] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
 
-  // Check online status
+  // Check online status - only on client
   useEffect(() => {
-    setIsOnline(navigator.onLine)
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-    
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-    
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
+    setMounted(true)
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      setIsOnline(navigator.onLine)
+      const handleOnline = () => setIsOnline(true)
+      const handleOffline = () => setIsOnline(false)
+      
+      window.addEventListener('online', handleOnline)
+      window.addEventListener('offline', handleOffline)
+      
+      return () => {
+        window.removeEventListener('online', handleOnline)
+        window.removeEventListener('offline', handleOffline)
+      }
     }
   }, [])
 
@@ -65,7 +69,7 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
     }
 
     // If offline, save to IndexedDB
-    if (!isOnline) {
+    if (mounted && !isOnline && typeof window !== 'undefined') {
       try {
         await initOfflineDB()
         await savePendingOperation({
@@ -188,7 +192,7 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
     <div className="min-h-screen bg-zinc-950 text-zinc-50 relative overflow-x-hidden">
       <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-lg pb-24 sm:pb-28">
         {/* Offline indicator */}
-        {!isOnline && (
+        {mounted && !isOnline && (
           <div className="mb-4 bg-orange-500/20 border border-orange-500/50 rounded-lg p-3 text-sm text-orange-300">
             ⚠️ You're offline. Changes will sync when you're back online.
           </div>

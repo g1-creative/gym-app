@@ -31,8 +31,8 @@ export function RestTimer({ duration, onComplete, onTimeUpdate, autoStart = fals
             setIsRunning(false)
             setIsComplete(true)
             if (onComplete) onComplete()
-            // Vibrate if supported
-            if ('vibrate' in navigator) {
+            // Vibrate if supported (only on client)
+            if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
               navigator.vibrate([200, 100, 200])
             }
           }
