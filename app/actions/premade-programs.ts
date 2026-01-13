@@ -139,8 +139,9 @@ export async function copyPremadeProgram(programId: string) {
 export async function getPremadePrograms() {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('programs')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('programs') as any
+  const result = await query
     .select(`
       *,
       workouts(
@@ -154,7 +155,17 @@ export async function getPremadePrograms() {
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
 
-  if (error) throw error
+  const { data, error } = result
+
+  if (error) {
+    console.error('Error fetching premade programs:', error)
+    // If column doesn't exist, return empty array (migration not run)
+    if (error.code === '42703' || error.message?.includes('column') || error.message?.includes('does not exist')) {
+      console.warn('is_premade column may not exist. Please run the migration.')
+      return []
+    }
+    throw error
+  }
   return data || []
 }
 

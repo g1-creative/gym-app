@@ -37,12 +37,25 @@ export function PremadeProgramsClient({ programs }: PremadeProgramsClientProps) 
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-6 sm:p-8">
           <Sparkles className="h-12 w-12 text-zinc-400 mx-auto mb-4" />
           <p className="text-base sm:text-lg text-zinc-300 mb-2">No premade programs available</p>
-          <p className="text-sm text-zinc-500 mb-4">Check back soon for new program templates!</p>
-          <Link href="/programs">
-            <Button variant="outline" className="text-sm sm:text-base">
-              Back to Programs
-            </Button>
-          </Link>
+          <p className="text-sm text-zinc-500 mb-4">
+            Programs may not be seeded yet. Visit{' '}
+            <Link href="/admin/seed-programs" className="text-blue-400 hover:underline">
+              /admin/seed-programs
+            </Link>{' '}
+            to add premade programs to the database.
+          </p>
+          <div className="flex gap-2 justify-center">
+            <Link href="/admin/seed-programs">
+              <Button className="text-sm sm:text-base">
+                Seed Programs
+              </Button>
+            </Link>
+            <Link href="/programs">
+              <Button variant="outline" className="text-sm sm:text-base">
+                Back to Programs
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     )

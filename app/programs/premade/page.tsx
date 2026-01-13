@@ -12,7 +12,13 @@ export default async function PremadeProgramsPage() {
     redirect('/login')
   }
 
-  const premadePrograms = await getPremadePrograms()
+  let premadePrograms = []
+  try {
+    premadePrograms = await getPremadePrograms()
+  } catch (error) {
+    console.error('Error loading premade programs:', error)
+    // Continue with empty array
+  }
 
   return (
     <PageLayout
