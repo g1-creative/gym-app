@@ -106,12 +106,12 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
           ...setDataWithRest,
           sessionId: session.id,
           exerciseId: selectedExercise,
-        })
+        }) as SetWithExercise
 
         // Update local state optimistically
         setSession((prev) => ({
           ...prev,
-          sets: [...prev.sets, newSet as SetWithExercise],
+          sets: [...prev.sets, newSet],
         }))
 
         setLastLoggedSetId(newSet.id)
@@ -124,7 +124,7 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
             const comparison = await getProgressiveOverloadComparison(selectedExercise, {
               weight: newSet.weight,
               reps: newSet.reps,
-              rpe: newSet.rpe,
+              rpe: newSet.rpe || null,
               volume,
             })
             setProgressiveOverload(comparison)
