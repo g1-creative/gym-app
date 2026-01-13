@@ -79,16 +79,52 @@ export async function deleteProgram(id: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  // First, verify the program exists and belongs to the user
+  const verifyQuery = supabase.from('programs') as any
+  const { data: existingProgram, error: verifyError } = await verifyQuery
+    .select('id, user_id')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .is('deleted_at', null)
+    .single()
+
+  if (verifyError || !existingProgram) {
+    throw new Error('Program not found or you do not have permission to delete it')
+  }
+
+  // Soft delete all associated workouts first
+  const workoutsQuery = supabase.from('workouts') as any
+  const { error: workoutsError } = await workoutsQuery
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('program_id', id)
+    .is('deleted_at', null)
+
+  if (workoutsError) {
+    console.error('Error deleting associated workouts:', workoutsError)
+    // Continue with program deletion even if workout deletion fails
+  }
+
+  // Soft delete the program
   const query = supabase.from('programs') as any
-  const { error } = await query
+  const { data, error } = await query
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
     .eq('user_id', user.id)
+    .select()
+    .single()
 
-  if (error) throw error
+  if (error) {
+    console.error('Error deleting program:', error)
+    throw new Error(`Failed to delete program: ${error.message || 'Unknown error'}`)
+  }
+
+  if (!data) {
+    throw new Error('Program deletion failed: No data returned')
+  }
 
   revalidatePath('/programs')
+  revalidatePath(`/programs/${id}`)
+  return data
 }
 
 export async function getPrograms() {

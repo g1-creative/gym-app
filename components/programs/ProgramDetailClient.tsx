@@ -48,15 +48,16 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
   }
 
   const handleDeleteProgram = async () => {
-    if (confirm('Delete this program? This cannot be undone.')) {
+    if (confirm('Delete this program? This will also delete all associated workouts. This cannot be undone.')) {
       startTransition(async () => {
         try {
           await deleteProgram(program.id)
           router.push('/programs')
           router.refresh()
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error deleting program:', error)
-          alert('Failed to delete program')
+          const errorMessage = error?.message || 'Failed to delete program. Please try again.'
+          alert(errorMessage)
         }
       })
     }
