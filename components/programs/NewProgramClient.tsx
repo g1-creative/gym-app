@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
 import { createProgram } from '@/app/actions/programs'
+import { Program } from '@/types'
 import { Save, X } from 'lucide-react'
 
 export function NewProgramClient() {
@@ -29,7 +30,7 @@ export function NewProgramClient() {
         formData.append('description', description.trim() || '')
         formData.append('is_active', isActive.toString())
         
-        const newProgram = await createProgram(formData)
+        const newProgram = await createProgram(formData) as Program
         router.push(`/programs/${newProgram.id}`)
         router.refresh()
       } catch (error) {
