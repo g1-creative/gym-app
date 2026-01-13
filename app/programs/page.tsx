@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getPrograms } from '@/app/actions/programs'
 import Link from 'next/link'
+import { PageLayout } from '@/components/layout/PageLayout'
+import { Button } from '@/components/ui/button'
+import { Plus, Calendar, ArrowRight } from 'lucide-react'
 
 export default async function ProgramsPage() {
   const supabase = await createClient()
@@ -14,56 +17,71 @@ export default async function ProgramsPage() {
   const programs = await getPrograms()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-4xl font-bold">Programs</h1>
-          <Link
-            href="/programs/new"
-            className="bg-primary-600 hover:bg-primary-700 px-6 py-2 rounded-lg font-semibold transition-colors"
-          >
-            + New Program
-          </Link>
-        </div>
-
-        {programs && programs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {programs.map((program: any) => (
-              <Link
-                key={program.id}
-                href={`/programs/${program.id}`}
-                className="block bg-slate-800 hover:bg-slate-700 rounded-lg p-6 transition-colors border border-slate-700"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold">{program.name}</h3>
-                  {program.is_active && (
-                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
-                      Active
-                    </span>
-                  )}
-                </div>
-                {program.description && (
-                  <p className="text-slate-400 text-sm">{program.description}</p>
-                )}
-                <div className="mt-4 text-slate-500 text-sm">
-                  Created {new Date(program.created_at).toLocaleDateString()}
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 text-slate-400">
-            <p className="text-xl mb-4">No programs yet</p>
+    <PageLayout
+      title="Programs"
+      subtitle={programs && programs.length > 0 ? `${programs.length} ${programs.length === 1 ? 'program' : 'programs'}` : undefined}
+      headerAction={
+        <Link href="/programs/new">
+          <Button className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 h-auto">
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5" />
+            New
+          </Button>
+        </Link>
+      }
+    >
+      {programs && programs.length > 0 ? (
+        <div className="space-y-2 sm:space-y-3">
+          {programs.map((program: any) => (
             <Link
-              href="/programs/new"
-              className="text-primary-400 hover:text-primary-300"
+              key={program.id}
+              href={`/programs/${program.id}`}
+              className="block"
             >
-              Create your first program →
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 flex-shrink-0">
+                    <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-sm sm:text-base truncate">{program.name}</h3>
+                      {program.is_active && (
+                        <span className="bg-green-500/20 text-green-400 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full border border-green-500/30">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    {program.description && (
+                      <p className="text-xs sm:text-sm text-zinc-400 truncate">{program.description}</p>
+                    )}
+                    <p className="text-[10px] sm:text-xs text-zinc-500 mt-1">
+                      Created {new Date(program.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-500 flex-shrink-0 ml-2" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="page-card rounded-lg sm:rounded-xl p-6 sm:p-8">
+            <p className="text-base sm:text-lg text-zinc-300 mb-3 sm:mb-4">No programs yet</p>
+            <Link href="/programs/new">
+              <Button className="text-sm sm:text-base">
+                <Plus className="h-4 w-4 mr-2" />
+                Create your first program
+              </Button>
             </Link>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </PageLayout>
   )
 }
 

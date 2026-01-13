@@ -2,6 +2,11 @@
 
 import { useState } from 'react'
 import { Exercise } from '@/types'
+import { PageLayout } from '@/components/layout/PageLayout'
+import { ExerciseChart } from './ExerciseChart'
+import { ChartDataPoint, ExerciseStats as ExerciseStatsType } from '@/types'
+import { BarChart3, TrendingUp, Weight, Repeat } from 'lucide-react'
+
 // Note: These actions should be called from client components
 // For now, we'll create wrapper functions that can be called from the client
 async function fetchExerciseChartData(exerciseId: string, days = 90) {
@@ -15,8 +20,6 @@ async function fetchExerciseStats(exerciseId: string, days = 90) {
   if (!res.ok) throw new Error('Failed to fetch stats')
   return res.json()
 }
-import { ExerciseChart } from './ExerciseChart'
-import { ChartDataPoint, ExerciseStats as ExerciseStatsType } from '@/types'
 
 interface AnalyticsClientProps {
   exercises: Exercise[]
@@ -47,19 +50,23 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-6">Analytics</h1>
+  const selectedExerciseName = exercises.find(e => e.id === selectedExercise)?.name || ''
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+  return (
+    <PageLayout
+      title="Analytics"
+      subtitle={selectedExercise ? selectedExerciseName : `${exercises.length} ${exercises.length === 1 ? 'exercise' : 'exercises'} available`}
+    >
+      <div className="space-y-4 sm:space-y-6">
+        {/* Exercise Selector */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium text-zinc-300 mb-2">
             Select Exercise
           </label>
           <select
             value={selectedExercise || ''}
             onChange={(e) => handleExerciseSelect(e.target.value)}
-            className="w-full md:w-auto px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl text-zinc-50 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500"
           >
             <option value="">Choose an exercise...</option>
             {exercises.map((exercise) => (
@@ -71,70 +78,111 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
         </div>
 
         {isLoading && (
-          <div className="text-center py-8 text-slate-400">Loading analytics...</div>
+          <div className="text-center py-8 sm:py-12">
+            <div className="page-card rounded-lg sm:rounded-xl p-6 sm:p-8">
+              <p className="text-sm sm:text-base text-zinc-400">Loading analytics...</p>
+            </div>
+          </div>
         )}
 
         {!isLoading && selectedExercise && stats && (
           <>
             {/* Stats Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400 mb-1">Total Sets</div>
-                <div className="text-2xl font-bold">{stats.totalSets}</div>
-              </div>
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400 mb-1">Total Volume</div>
-                <div className="text-2xl font-bold">{stats.totalVolume.toFixed(0)} kg</div>
-              </div>
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400 mb-1">Max Weight</div>
-                <div className="text-2xl font-bold">
-                  {stats.maxWeight ? `${stats.maxWeight} kg` : 'N/A'}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10">
+                    <Repeat className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
+                  </div>
                 </div>
+                <div className="text-xl sm:text-2xl font-bold">{stats.totalSets}</div>
+                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Sets</div>
               </div>
-              <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400 mb-1">Max Reps</div>
-                <div className="text-2xl font-bold">{stats.maxReps || 'N/A'}</div>
+
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/10">
+                    <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-400" />
+                  </div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold">{stats.totalVolume.toFixed(0)}</div>
+                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Volume (kg)</div>
+              </div>
+
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-orange-500/10">
+                    <Weight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-400" />
+                  </div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold">
+                  {stats.maxWeight ? `${stats.maxWeight}` : 'N/A'}
+                </div>
+                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Max Weight (kg)</div>
+              </div>
+
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10">
+                    <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-400" />
+                  </div>
+                </div>
+                <div className="text-xl sm:text-2xl font-bold">{stats.maxReps || 'N/A'}</div>
+                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Max Reps</div>
               </div>
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <ExerciseChart
-                data={chartData}
-                dataKey="weight"
-                title="Weight Progression"
-                color="#0ea5e9"
-              />
-              <ExerciseChart
-                data={chartData}
-                dataKey="volume"
-                title="Volume Progression"
-                color="#10b981"
-              />
-              <ExerciseChart
-                data={chartData}
-                dataKey="reps"
-                title="Reps Progression"
-                color="#f59e0b"
-              />
-              <ExerciseChart
-                data={chartData}
-                dataKey="estimated1RM"
-                title="Estimated 1RM"
-                color="#ef4444"
-              />
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <ExerciseChart
+                  data={chartData}
+                  dataKey="weight"
+                  title="Weight Progression"
+                  color="#0ea5e9"
+                />
+              </div>
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <ExerciseChart
+                  data={chartData}
+                  dataKey="volume"
+                  title="Volume Progression"
+                  color="#10b981"
+                />
+              </div>
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <ExerciseChart
+                  data={chartData}
+                  dataKey="reps"
+                  title="Reps Progression"
+                  color="#f59e0b"
+                />
+              </div>
+              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <ExerciseChart
+                  data={chartData}
+                  dataKey="estimated1RM"
+                  title="Estimated 1RM"
+                  color="#ef4444"
+                />
+              </div>
             </div>
           </>
         )}
 
         {!isLoading && !selectedExercise && (
-          <div className="text-center py-12 text-slate-400">
-            Select an exercise to view analytics
+          <div className="text-center py-12">
+            <div className="page-card rounded-lg sm:rounded-xl p-6 sm:p-8">
+              <BarChart3 className="h-12 w-12 sm:h-16 sm:w-16 text-zinc-600 mx-auto mb-4" />
+              <p className="text-base sm:text-lg text-zinc-300 mb-2">Select an exercise to view analytics</p>
+              <p className="text-xs sm:text-sm text-zinc-500">
+                Choose from {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'} above
+              </p>
+            </div>
           </div>
         )}
       </div>
-    </div>
+    </PageLayout>
   )
 }
 
