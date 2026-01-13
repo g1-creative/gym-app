@@ -1,6 +1,6 @@
 {
-  "name": "Gym Tracker",
-  "short_name": "Gym Tracker",
+  "name": "Gymville",
+  "short_name": "Gymville",
   "description": "Progressive overload tracking and workout logging PWA",
   "start_url": "/",
   "display": "standalone",

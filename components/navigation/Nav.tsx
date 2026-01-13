@@ -44,6 +44,14 @@ export function Nav() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <img 
+                src="/gymville-logo.png" 
+                alt="Gymville" 
+                className="h-8 w-auto"
+              />
+              <span className="text-white font-semibold text-lg hidden sm:block">Gymville</span>
+            </Link>
             {navItems.map((item) => (
               <Link
                 key={item.href}

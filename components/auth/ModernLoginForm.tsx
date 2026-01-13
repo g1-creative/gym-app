@@ -227,10 +227,14 @@ export default function ModernLoginForm() {
 
       {/* header */}
       <header className="absolute left-0 right-0 top-0 flex items-center justify-between px-6 py-4 border-b border-zinc-800/80">
-        <div className="flex items-center gap-2">
-          <Dumbbell className="h-5 w-5 text-zinc-400" />
-          <span className="text-xs tracking-[0.14em] uppercase text-zinc-400">
-            GYM TRACKER
+        <div className="flex items-center gap-3">
+          <img 
+            src="/gymville-logo.png" 
+            alt="Gymville" 
+            className="h-8 w-auto"
+          />
+          <span className="text-sm font-semibold text-white">
+            Gymville
           </span>
         </div>
         <Button

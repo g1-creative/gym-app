@@ -8,7 +8,7 @@ import BottomNavBar from '@/components/ui/bottom-nav-bar'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Gym Tracker - Progressive Overload Tracker',
+  title: 'Gymville - Progressive Overload Tracker',
   description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals',
   manifest: '/manifest.json',
   icons: {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Gym Tracker',
+    title: 'Gymville',
   },
 }
 
