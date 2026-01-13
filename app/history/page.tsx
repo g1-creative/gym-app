@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
 import { Calendar, ArrowRight, Clock, TrendingUp, PlayCircle } from 'lucide-react'
+import { formatVolume } from '@/lib/utils/weight'
 
 export default async function HistoryPage() {
   const supabase = await createClient()
@@ -30,7 +31,7 @@ export default async function HistoryPage() {
               href={`/workout/${session.id}`}
               className="block"
             >
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                   <div className="p-1.5 sm:p-2 rounded-lg bg-zinc-800 flex-shrink-0">
                     <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-400" />
@@ -64,7 +65,7 @@ export default async function HistoryPage() {
                           <div className="flex items-center gap-1">
                             <TrendingUp className="h-3 w-3 text-green-400" />
                             <span className="text-[10px] sm:text-xs text-green-400 font-medium">
-                              {session.total_volume.toFixed(0)} kg
+                              {formatVolume(session.total_volume)}
                             </span>
                           </div>
                         </>
@@ -79,7 +80,7 @@ export default async function HistoryPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="page-card rounded-lg sm:rounded-xl p-6 sm:p-8">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-6 sm:p-8">
             <p className="text-base sm:text-lg text-zinc-300 mb-3 sm:mb-4">No workouts yet</p>
             <Link href="/workout/new">
               <Button className="text-sm sm:text-base">

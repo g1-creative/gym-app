@@ -11,8 +11,9 @@ import { completeSession, updateSession } from '@/app/actions/sessions'
 import { getProgressiveOverloadComparison } from '@/app/actions/analytics'
 import { useRouter } from 'next/navigation'
 import { SetWithExercise, ProgressiveOverloadComparison } from '@/types'
-import { Pencil, Save, X } from 'lucide-react'
+import { Pencil, Save, X, Dumbbell, Clock } from 'lucide-react'
 import { initOfflineDB, savePendingOperation } from '@/lib/utils/offline'
+import { formatWeight, formatVolume, kgToLbs } from '@/lib/utils/weight'
 
 interface ActiveWorkoutClientProps {
   session: WorkoutSessionWithSets
@@ -201,10 +202,14 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
         <header className="mb-4 sm:mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">
-                {session.workout ? (session.workout as any).name : 'Active Workout'}
-              </h1>
-              <p className="text-zinc-400 text-xs sm:text-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6 text-zinc-400" />
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                  {session.workout ? (session.workout as any).name : 'Active Workout'}
+                </h1>
+              </div>
+              <p className="text-zinc-400 text-xs sm:text-sm flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
                 Started {new Date(session.started_at).toLocaleTimeString()}
               </p>
             </div>
@@ -266,8 +271,11 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
 
           {session.total_volume && (
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 sm:p-4">
-              <div className="text-xs sm:text-sm text-zinc-400 mb-1">Total Volume</div>
-              <div className="text-xl sm:text-2xl font-bold">{session.total_volume.toFixed(0)} kg</div>
+              <div className="flex items-center gap-2 mb-1">
+                <Dumbbell className="h-4 w-4 text-zinc-400" />
+                <div className="text-xs sm:text-sm text-zinc-400">Total Volume</div>
+              </div>
+              <div className="text-xl sm:text-2xl font-bold text-white">{formatVolume(session.total_volume)}</div>
             </div>
           )}
         </header>
@@ -347,15 +355,18 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
                       className="flex items-center justify-between bg-zinc-900/50 rounded-lg p-2 sm:p-3"
                     >
                       <div className="flex items-center gap-2 sm:gap-4 flex-wrap text-xs sm:text-sm">
-                        <span className="text-zinc-400">Set {set.set_number}</span>
-                        {set.weight && <span>{set.weight} kg</span>}
-                        {set.reps && <span>{set.reps} reps</span>}
+                        <span className="text-zinc-400 font-medium">Set {set.set_number}</span>
+                        {set.weight && <span className="text-white font-semibold">{formatWeight(set.weight)}</span>}
+                        {set.reps && <span className="text-white">{set.reps} reps</span>}
                         {set.rpe && <span className="text-zinc-400">RPE {set.rpe}</span>}
                         {set.rest_seconds && (
-                          <span className="text-zinc-500">Rest: {Math.floor(set.rest_seconds / 60)}:{String(set.rest_seconds % 60).padStart(2, '0')}</span>
+                          <span className="text-zinc-500 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {Math.floor(set.rest_seconds / 60)}:{String(set.rest_seconds % 60).padStart(2, '0')}
+                          </span>
                         )}
                         {set.volume && (
-                          <span className="text-primary-400 font-medium">{set.volume.toFixed(0)} kg</span>
+                          <span className="text-white font-semibold bg-zinc-800 px-2 py-0.5 rounded">{formatVolume(set.volume)}</span>
                         )}
                       </div>
                       {set.notes && (

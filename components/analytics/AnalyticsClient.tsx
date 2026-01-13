@@ -6,6 +6,7 @@ import { PageLayout } from '@/components/layout/PageLayout'
 import { ExerciseChart } from './ExerciseChart'
 import { ChartDataPoint, ExerciseStats as ExerciseStatsType } from '@/types'
 import { BarChart3, TrendingUp, Weight, Repeat } from 'lucide-react'
+import { formatWeight, formatVolume } from '@/lib/utils/weight'
 
 // Note: These actions should be called from client components
 // For now, we'll create wrapper functions that can be called from the client
@@ -89,7 +90,7 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
           <>
             {/* Stats Summary */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                   <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10">
                     <Repeat className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
@@ -99,29 +100,29 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
                 <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Sets</div>
               </div>
 
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                   <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/10">
                     <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-400" />
                   </div>
                 </div>
-                <div className="text-xl sm:text-2xl font-bold">{stats.totalVolume.toFixed(0)}</div>
-                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Volume (kg)</div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{formatVolume(stats.totalVolume)}</div>
+                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Total Volume</div>
               </div>
 
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                   <div className="p-1.5 sm:p-2 rounded-lg bg-orange-500/10">
                     <Weight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-400" />
                   </div>
                 </div>
-                <div className="text-xl sm:text-2xl font-bold">
-                  {stats.maxWeight ? `${stats.maxWeight}` : 'N/A'}
+                <div className="text-xl sm:text-2xl font-bold text-white">
+                  {stats.maxWeight ? formatWeight(stats.maxWeight) : 'N/A'}
                 </div>
-                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Max Weight (kg)</div>
+                <div className="text-[10px] sm:text-xs text-zinc-400 leading-tight">Max Weight</div>
               </div>
 
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                   <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10">
                     <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-400" />
@@ -134,7 +135,7 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
 
             {/* Charts */}
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <ExerciseChart
                   data={chartData}
                   dataKey="weight"
@@ -142,7 +143,7 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
                   color="#0ea5e9"
                 />
               </div>
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <ExerciseChart
                   data={chartData}
                   dataKey="volume"
@@ -150,7 +151,7 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
                   color="#10b981"
                 />
               </div>
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <ExerciseChart
                   data={chartData}
                   dataKey="reps"
@@ -158,7 +159,7 @@ export function AnalyticsClient({ exercises }: AnalyticsClientProps) {
                   color="#f59e0b"
                 />
               </div>
-              <div className="page-card rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <ExerciseChart
                   data={chartData}
                   dataKey="estimated1RM"
