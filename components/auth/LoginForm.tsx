@@ -41,7 +41,17 @@ export function LoginForm() {
           throw error
         }
         
-        console.log('[LOGIN] Success! Redirecting...')
+        console.log('[LOGIN] Success! Checking session...')
+        
+        // Verify session is established
+        const { data: { session } } = await supabase.auth.getSession()
+        console.log('[LOGIN] Session exists:', !!session)
+        console.log('[LOGIN] Current cookies:', document.cookie.split(';').map(c => c.trim().split('=')[0]))
+        
+        // Wait for cookies to be written by browser
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        console.log('[LOGIN] Redirecting to dashboard...')
         // Use hard redirect for reliability
         window.location.href = '/'
       }
