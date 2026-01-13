@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 import { cn } from "@/lib/utils"
@@ -26,7 +25,6 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
 }
 
 export function Component() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -87,8 +85,7 @@ export function Component() {
         // If session exists, they're logged in automatically (email confirmation disabled)
         if (data.session) {
           console.log('[CLIENT] Signup successful with session, redirecting...');
-          router.push('/');
-          router.refresh();
+          window.location.href = '/';
         } else {
           // Email confirmation required
           alert('Please check your email to confirm your account.');
@@ -110,11 +107,9 @@ export function Component() {
         }
         
         if (data.session) {
-          console.log('[CLIENT] Sign in successful, session established');
-          // Use router navigation instead of window.location
-          // This works better with Next.js middleware
-          router.push('/');
-          router.refresh();
+          console.log('[CLIENT] Sign in successful, redirecting with hard reload...');
+          // Use window.location for hard redirect - ensures middleware sees new cookies
+          window.location.href = '/';
         } else {
           setError('Failed to create session');
           setIsLoading(false);
