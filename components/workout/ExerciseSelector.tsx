@@ -3,14 +3,8 @@
 import { useState, useEffect } from 'react'
 import { searchExercises } from '@/app/actions/exercises'
 import { createExercise } from '@/app/actions/exercises'
+import { Exercise } from '@/types'
 import { X, Search, Plus } from 'lucide-react'
-
-interface Exercise {
-  id: string
-  name: string
-  muscle_groups?: string[] | null
-  equipment?: string | null
-}
 
 interface ExerciseSelectorProps {
   isOpen: boolean
@@ -59,7 +53,7 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
       formData.append('name', newExerciseName.trim())
       formData.append('is_custom', 'true')
       
-      const newExercise = await createExercise(formData)
+      const newExercise = await createExercise(formData) as Exercise
       onSelect(newExercise.id)
       setNewExerciseName('')
       setShowCreateForm(false)
