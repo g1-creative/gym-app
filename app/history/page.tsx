@@ -4,7 +4,7 @@ import { getSessions } from '@/app/actions/sessions'
 import Link from 'next/link'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
-import { Calendar, ArrowRight, Clock, TrendingUp, PlayCircle } from 'lucide-react'
+import { Calendar, ArrowRight, Clock, TrendingUp, PlayCircle, Repeat } from 'lucide-react'
 import { formatVolume } from '@/lib/utils/weight'
 
 export default async function HistoryPage() {
@@ -48,6 +48,17 @@ export default async function HistoryPage() {
                           year: 'numeric'
                         })}
                       </p>
+                      {session.workout_day_number && (
+                        <>
+                          <span className="text-zinc-600">•</span>
+                          <div className="flex items-center gap-1">
+                            <Repeat className="h-3 w-3 text-blue-400" />
+                            <span className="text-[10px] sm:text-xs text-blue-400 font-medium">
+                              Cycle {session.workout_day_number}
+                            </span>
+                          </div>
+                        </>
+                      )}
                       {session.duration_seconds && (
                         <>
                           <span className="text-zinc-600">•</span>

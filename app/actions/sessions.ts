@@ -7,6 +7,7 @@ import { z } from 'zod'
 const sessionSchema = z.object({
   program_id: z.string().uuid().optional().nullable(),
   workout_id: z.string().uuid().optional().nullable(),
+  workout_day_number: z.number().int().optional().nullable(),
   notes: z.string().max(1000).optional().nullable(),
 })
 
@@ -19,6 +20,7 @@ export async function createSession(formData: FormData) {
   const rawData = {
     program_id: formData.get('program_id') as string | null,
     workout_id: formData.get('workout_id') as string | null,
+    workout_day_number: formData.get('workout_day_number') ? parseInt(formData.get('workout_day_number') as string) : null,
     notes: formData.get('notes') as string | null,
   }
 
@@ -234,5 +236,39 @@ export async function getSessionsForWorkout(workoutId: string, limit = 10) {
   const { data, error } = result
   if (error) throw error
   return data || []
+}
+
+/**
+ * Get the next workout day number for a workout
+ * This calculates which iteration/cycle the user is on
+ */
+export async function getNextWorkoutDayNumber(workoutId: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('workout_sessions') as any
+  const result = await query
+    .select('workout_day_number')
+    .eq('user_id', user.id)
+    .eq('workout_id', workoutId)
+    .not('workout_day_number', 'is', null)
+    .is('deleted_at', null)
+    .order('workout_day_number', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const { data, error } = result
+  if (error && error.code !== 'PGRST116') throw error // PGRST116 is "no rows returned"
+  
+  // If no previous sessions, start at day 1
+  if (!data || !data.workout_day_number) {
+    return 1
+  }
+  
+  // Return next day number
+  return (data.workout_day_number || 0) + 1
 }
 

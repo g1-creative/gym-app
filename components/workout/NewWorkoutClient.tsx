@@ -2,13 +2,12 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { Program } from '@/types'
-import { createSession } from '@/app/actions/sessions'
+import { createSession, getSessionsForWorkout, getNextWorkoutDayNumber } from '@/app/actions/sessions'
 import { getWorkoutsForProgram } from '@/app/actions/workouts'
-import { getSessionsForWorkout } from '@/app/actions/sessions'
 import { useRouter } from 'next/navigation'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
-import { PlayCircle, Calendar, TrendingUp, Clock, ArrowRight, BarChart3 } from 'lucide-react'
+import { PlayCircle, Calendar, TrendingUp, Clock, ArrowRight, BarChart3, Repeat } from 'lucide-react'
 import { formatVolume } from '@/lib/utils/weight'
 import Link from 'next/link'
 
@@ -21,6 +20,7 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
   const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null)
   const [workouts, setWorkouts] = useState<any[]>([])
   const [previousSessions, setPreviousSessions] = useState<any[]>([])
+  const [nextDayNumber, setNextDayNumber] = useState<number | null>(null)
   const [isLoadingWorkouts, setIsLoadingWorkouts] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -49,19 +49,25 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
     }
   }, [selectedProgram])
 
-  // Fetch previous sessions when workout is selected
+  // Fetch previous sessions and day number when workout is selected
   useEffect(() => {
     if (selectedWorkout) {
-      getSessionsForWorkout(selectedWorkout, 5)
-        .then((data) => {
-          setPreviousSessions(data || [])
+      Promise.all([
+        getSessionsForWorkout(selectedWorkout, 5),
+        getNextWorkoutDayNumber(selectedWorkout)
+      ])
+        .then(([sessions, dayNumber]) => {
+          setPreviousSessions(sessions || [])
+          setNextDayNumber(dayNumber)
         })
         .catch((error) => {
-          console.error('Error fetching previous sessions:', error)
+          console.error('Error fetching workout data:', error)
           setPreviousSessions([])
+          setNextDayNumber(1)
         })
     } else {
       setPreviousSessions([])
+      setNextDayNumber(null)
     }
   }, [selectedWorkout])
 
@@ -70,7 +76,13 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
       try {
         const formData = new FormData()
         if (selectedProgram) formData.append('program_id', selectedProgram)
-        if (selectedWorkout) formData.append('workout_id', selectedWorkout)
+        if (selectedWorkout) {
+          formData.append('workout_id', selectedWorkout)
+          // Add workout day number for tracking cycles
+          if (nextDayNumber !== null) {
+            formData.append('workout_day_number', nextDayNumber.toString())
+          }
+        }
 
         const session = await createSession(formData)
         router.push('/workout/active')
@@ -144,6 +156,23 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
                   {selectedWorkoutData && selectedWorkoutData.description && (
                     <p className="text-xs text-zinc-500 mt-1">{selectedWorkoutData.description}</p>
                   )}
+                  {nextDayNumber !== null && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg px-2 py-1">
+                        <div className="flex items-center gap-1.5">
+                          <Repeat className="h-3.5 w-3.5 text-blue-400" />
+                          <span className="text-xs font-semibold text-blue-400">
+                            Cycle {nextDayNumber}
+                          </span>
+                        </div>
+                      </div>
+                      {previousSessions.length > 0 && (
+                        <span className="text-xs text-zinc-500">
+                          ({previousSessions.length} previous {previousSessions.length === 1 ? 'session' : 'sessions'})
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -153,9 +182,16 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
         {/* Previous Sessions Comparison */}
         {selectedWorkout && previousSessions.length > 0 && (
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="h-4 w-4 text-zinc-400" />
-              <h3 className="text-xs sm:text-sm font-semibold text-zinc-300">Previous Sessions</h3>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-zinc-400" />
+                <h3 className="text-xs sm:text-sm font-semibold text-zinc-300">Previous Sessions</h3>
+              </div>
+              {nextDayNumber !== null && (
+                <div className="text-xs text-zinc-500">
+                  Starting Cycle {nextDayNumber}
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               {previousSessions.slice(0, 3).map((session: any) => (
@@ -165,15 +201,26 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
                   className="block bg-zinc-800/50 rounded-lg p-2 sm:p-3 hover:bg-zinc-800 transition-colors"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
                       <Calendar className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
-                      <span className="text-xs sm:text-sm text-zinc-300 truncate">
+                      <span className="text-xs sm:text-sm text-zinc-300">
                         {new Date(session.started_at).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric'
                         })}
                       </span>
+                      {session.workout_day_number && (
+                        <>
+                          <span className="text-zinc-600">•</span>
+                          <div className="flex items-center gap-1">
+                            <Repeat className="h-3 w-3 text-blue-400" />
+                            <span className="text-xs text-blue-400 font-medium">
+                              Cycle {session.workout_day_number}
+                            </span>
+                          </div>
+                        </>
+                      )}
                       {session.duration_seconds && (
                         <>
                           <span className="text-zinc-600">•</span>

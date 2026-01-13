@@ -6,8 +6,8 @@ import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
 import { updateProgram, deleteProgram } from '@/app/actions/programs'
 import { createWorkout, updateWorkout, deleteWorkout } from '@/app/actions/workouts'
-import { createSession, getSessionsForWorkout } from '@/app/actions/sessions'
-import { Plus, Edit, Trash2, Play, Save, X, Calendar, Clock, TrendingUp, BarChart3, ArrowRight } from 'lucide-react'
+import { createSession, getSessionsForWorkout, getNextWorkoutDayNumber } from '@/app/actions/sessions'
+import { Plus, Edit, Trash2, Play, Save, X, Calendar, Clock, TrendingUp, BarChart3, ArrowRight, Repeat } from 'lucide-react'
 import { formatVolume } from '@/lib/utils/weight'
 import Link from 'next/link'
 
@@ -33,18 +33,25 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
   const [expandedWorkouts, setExpandedWorkouts] = useState<Record<string, boolean>>({})
   const router = useRouter()
 
-  // Load previous sessions for each workout
+  // Load previous sessions and day numbers for each workout
   useEffect(() => {
     workouts.forEach((workout) => {
-      getSessionsForWorkout(workout.id, 3)
-        .then((sessions) => {
+      Promise.all([
+        getSessionsForWorkout(workout.id, 3),
+        getNextWorkoutDayNumber(workout.id)
+      ])
+        .then(([sessions, dayNumber]) => {
           setWorkoutSessions((prev) => ({
             ...prev,
             [workout.id]: sessions || []
           }))
+          setWorkoutDayNumbers((prev) => ({
+            ...prev,
+            [workout.id]: dayNumber
+          }))
         })
         .catch((error) => {
-          console.error('Error fetching sessions for workout:', error)
+          console.error('Error fetching workout data:', error)
         })
     })
   }, [workouts])
@@ -142,6 +149,10 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
         const formData = new FormData()
         formData.append('program_id', program.id)
         formData.append('workout_id', workoutId)
+        
+        // Add workout day number for tracking cycles
+        const dayNumber = workoutDayNumbers[workoutId] || 1
+        formData.append('workout_day_number', dayNumber.toString())
         
         await createSession(formData)
         router.push('/workout/active')
@@ -365,6 +376,17 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
                                 {workout.rest_timer_seconds || 90}s rest
                               </span>
                             </div>
+                            {dayNumber && dayNumber > 1 && (
+                              <>
+                                <span className="text-zinc-600">•</span>
+                                <div className="flex items-center gap-1">
+                                  <Repeat className="h-3 w-3 text-blue-400" />
+                                  <span className="text-[10px] sm:text-xs text-blue-400 font-medium">
+                                    Cycle {dayNumber}
+                                  </span>
+                                </div>
+                              </>
+                            )}
                             {hasSessions && (
                               <>
                                 <span className="text-zinc-600">•</span>
@@ -432,6 +454,17 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
                                     year: 'numeric'
                                   })}
                                 </span>
+                                {session.workout_day_number && (
+                                  <>
+                                    <span className="text-zinc-600">•</span>
+                                    <div className="flex items-center gap-1">
+                                      <Repeat className="h-3 w-3 text-blue-400" />
+                                      <span className="text-xs text-blue-400 font-medium">
+                                        Cycle {session.workout_day_number}
+                                      </span>
+                                    </div>
+                                  </>
+                                )}
                                 {session.duration_seconds && (
                                   <>
                                     <span className="text-zinc-600">•</span>

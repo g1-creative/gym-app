@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getSession } from '@/app/actions/sessions'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { formatWeight, formatVolume } from '@/lib/utils/weight'
-import { Calendar, Clock, TrendingUp, Dumbbell, ArrowLeft } from 'lucide-react'
+import { Calendar, Clock, TrendingUp, Dumbbell, ArrowLeft, Repeat } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -65,7 +65,7 @@ export default async function WorkoutSessionPage({ params }: { params: { id: str
       <div className="space-y-4 sm:space-y-6">
         {/* Session Info */}
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-3">
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-zinc-400">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-zinc-400 flex-wrap">
             <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span>
               {new Date(session.started_at).toLocaleDateString('en-US', {
@@ -82,6 +82,17 @@ export default async function WorkoutSessionPage({ params }: { params: { id: str
                 minute: '2-digit'
               })}
             </span>
+            {(session as any).workout_day_number && (
+              <>
+                <span className="text-zinc-600">•</span>
+                <div className="flex items-center gap-1">
+                  <Repeat className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
+                  <span className="text-blue-400 font-medium">
+                    Cycle {(session as any).workout_day_number}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
           {duration && (
