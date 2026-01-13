@@ -67,36 +67,36 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-lg w-full max-w-md max-h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
-          <h2 className="text-xl font-semibold">Select Exercise</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-4">
+      <div className="bg-zinc-950 border border-zinc-800 rounded-lg sm:rounded-xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-zinc-800">
+          <h2 className="text-lg sm:text-xl font-semibold text-white">Select Exercise</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white"
+            className="text-zinc-400 hover:text-white transition-colors p-1"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-3 sm:p-4 border-b border-zinc-800">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search exercises..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
           {showCreateForm ? (
             <form onSubmit={handleCreateExercise} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-zinc-300 mb-2">
                   Exercise Name
                 </label>
                 <input
@@ -104,14 +104,14 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
                   value={newExerciseName}
                   onChange={(e) => setNewExerciseName(e.target.value)}
                   placeholder="e.g., Bench Press"
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 bg-zinc-900/50 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
                   autoFocus
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 bg-black hover:bg-zinc-900 text-white font-semibold py-2 rounded-lg transition-colors"
+                  className="flex-1 bg-black hover:bg-zinc-900 text-white font-semibold py-2 rounded-lg transition-colors text-sm"
                 >
                   Create
                 </button>
@@ -121,7 +121,7 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
                     setShowCreateForm(false)
                     setNewExerciseName('')
                   }}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 text-white rounded-lg transition-colors text-sm"
                 >
                   Cancel
                 </button>
@@ -131,16 +131,16 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
             <>
               <button
                 onClick={() => setShowCreateForm(true)}
-                className="w-full mb-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg text-white flex items-center justify-center gap-2 transition-colors"
+                className="w-full mb-4 px-4 py-2.5 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-white flex items-center justify-center gap-2 transition-colors text-sm font-medium"
               >
                 <Plus className="h-4 w-4" />
                 Create New Exercise
               </button>
 
               {isLoading ? (
-                <div className="text-center py-8 text-slate-400">Loading...</div>
+                <div className="text-center py-8 text-zinc-400 text-sm">Loading...</div>
               ) : exercises.length === 0 ? (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-zinc-400 text-sm">
                   {searchQuery ? 'No exercises found' : 'Start typing to search'}
                 </div>
               ) : (
@@ -152,11 +152,11 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
                         onSelect(exercise.id)
                         onClose()
                       }}
-                      className="w-full text-left px-4 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+                      className="w-full text-left px-3 py-2.5 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 rounded-lg transition-colors"
                     >
-                      <div className="font-medium">{exercise.name}</div>
+                      <div className="font-medium text-sm text-white">{exercise.name}</div>
                       {exercise.muscle_groups && exercise.muscle_groups.length > 0 && (
-                        <div className="text-sm text-slate-400">
+                        <div className="text-xs text-zinc-400 mt-0.5">
                           {exercise.muscle_groups.join(', ')}
                         </div>
                       )}
