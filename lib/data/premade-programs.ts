@@ -373,5 +373,299 @@ export const PREMADE_PROGRAMS: PremadeProgram[] = [
         ]
       },
     ]
+  },
+  {
+    name: "Sam Sulek Twist",
+    description: "A 6-day high-volume bodybuilding split inspired by Sam Sulek's training style. Focus on pump, volume, and progressive overload. Day 7 is optional for arms/delts pump, weak points, or active recovery.",
+    workouts: [
+      {
+        name: "Day 1: Chest + Triceps",
+        description: "Chest and triceps focus",
+        order_index: 0,
+        rest_timer_seconds: 90,
+        exercises: [
+          {
+            name: "Incline Smith Press",
+            order_index: 0,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 8-12 reps",
+          },
+          {
+            name: "Machine Chest Press",
+            order_index: 1,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 10-15 reps",
+          },
+          {
+            name: "Cable Fly (mid to low)",
+            order_index: 2,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 12-20 reps",
+          },
+          {
+            name: "Dips (assisted or weighted)",
+            order_index: 3,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: AMRAP",
+          },
+          {
+            name: "Rope Pushdowns",
+            order_index: 4,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 10-15 reps",
+          },
+          {
+            name: "Overhead Cable Extensions",
+            order_index: 5,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 12-20 reps",
+          },
+          {
+            name: "Single-Arm Pushdowns",
+            order_index: 6,
+            rest_timer_seconds: 90,
+            notes: "2 Sets: AMRAP",
+          },
+        ]
+      },
+      {
+        name: "Day 2: Back + Biceps",
+        description: "Back and biceps focus",
+        order_index: 1,
+        rest_timer_seconds: 90,
+        exercises: [
+          {
+            name: "Lat Pulldown (wide or neutral)",
+            order_index: 0,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 8-12 reps",
+          },
+          {
+            name: "Chest-Supported Row",
+            order_index: 1,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 10-15 reps",
+          },
+          {
+            name: "Seated Cable Row",
+            order_index: 2,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 12-15 reps",
+          },
+          {
+            name: "Straight-Arm Pulldown",
+            order_index: 3,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 15-20 reps",
+          },
+          {
+            name: "EZ-Bar Curl",
+            order_index: 4,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 8-12 reps",
+          },
+          {
+            name: "Preacher Curl (machine preferred)",
+            order_index: 5,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 10-15 reps",
+          },
+          {
+            name: "Cable Curl (slow)",
+            order_index: 6,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 12-20 reps",
+          },
+        ]
+      },
+      {
+        name: "Day 3: Legs (Hamstring/Glute)",
+        description: "Hamstring and glute focused leg day",
+        order_index: 2,
+        rest_timer_seconds: 90,
+        exercises: [
+          {
+            name: "Lying or Seated Leg Curl",
+            order_index: 0,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 10-15 reps",
+          },
+          {
+            name: "Romanian Deadlift",
+            order_index: 1,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 8-12 reps",
+          },
+          {
+            name: "Smith Machine Squat (hip bias)",
+            order_index: 2,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 8-12 reps",
+          },
+          {
+            name: "Hip Thrust or Glute Bridge",
+            order_index: 3,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 10-15 reps",
+          },
+          {
+            name: "Adductor Machine",
+            order_index: 4,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 12-20 reps",
+          },
+          {
+            name: "Seated Calf Raise",
+            order_index: 5,
+            rest_timer_seconds: 60,
+            notes: "5 Sets: 12-20 reps",
+          },
+        ]
+      },
+      {
+        name: "Day 4: Shoulders + Arms",
+        description: "Shoulders, triceps, and biceps",
+        order_index: 3,
+        rest_timer_seconds: 90,
+        exercises: [
+          {
+            name: "Seated DB Shoulder Press",
+            order_index: 0,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 8-12 reps",
+          },
+          {
+            name: "Machine Lateral Raise",
+            order_index: 1,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 12-20 reps",
+          },
+          {
+            name: "Cable Lateral Raise",
+            order_index: 2,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 15-20 reps",
+          },
+          {
+            name: "Rear Delt Fly (machine or cables)",
+            order_index: 3,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 15-20 reps",
+          },
+          {
+            name: "Close-Grip Bench or Machine Press",
+            order_index: 4,
+            rest_timer_seconds: 120,
+            notes: "3 Sets: 8-12 reps",
+          },
+          {
+            name: "Rope Pushdowns",
+            order_index: 5,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 12-15 reps",
+          },
+          {
+            name: "Incline DB Curls",
+            order_index: 6,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 10-15 reps",
+          },
+          {
+            name: "Hammer Curls",
+            order_index: 7,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 12-15 reps",
+          },
+        ]
+      },
+      {
+        name: "Day 5: Legs (Quad Bias)",
+        description: "Quad focused leg day",
+        order_index: 4,
+        rest_timer_seconds: 90,
+        exercises: [
+          {
+            name: "Seated Leg Curl (warm-up focus)",
+            order_index: 0,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 12-20 reps",
+          },
+          {
+            name: "Back Squat",
+            order_index: 1,
+            rest_timer_seconds: 180,
+            notes: "5 Sets: 6-12 reps. Target: 205 lbs",
+          },
+          {
+            name: "Leg Press (quad stance)",
+            order_index: 2,
+            rest_timer_seconds: 120,
+            notes: "4 Sets: 10-15 reps",
+          },
+          {
+            name: "Walking Lunges",
+            order_index: 3,
+            rest_timer_seconds: 90,
+            notes: "3 Sets: 20-30 steps",
+          },
+          {
+            name: "Leg Extensions",
+            order_index: 4,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 12-20 reps + partials",
+          },
+          {
+            name: "Standing Calf Raise",
+            order_index: 5,
+            rest_timer_seconds: 60,
+            notes: "5 Sets: 10-20 reps",
+          },
+        ]
+      },
+      {
+        name: "Day 6: Chest + Back (Pump/Volume)",
+        description: "High volume pump day for chest and back",
+        order_index: 5,
+        rest_timer_seconds: 60,
+        exercises: [
+          {
+            name: "Incline Machine Press",
+            order_index: 0,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 10-15 reps",
+          },
+          {
+            name: "Pec Deck",
+            order_index: 1,
+            rest_timer_seconds: 60,
+            notes: "4 Sets: 12-20 reps",
+          },
+          {
+            name: "Neutral-Grip Pulldown",
+            order_index: 2,
+            rest_timer_seconds: 90,
+            notes: "4 Sets: 10-15 reps",
+          },
+          {
+            name: "Single-Arm Machine Row",
+            order_index: 3,
+            rest_timer_seconds: 60,
+            notes: "3 Sets: 12-15 reps",
+          },
+          {
+            name: "Cable Fly (stretch focus)",
+            order_index: 4,
+            rest_timer_seconds: 60,
+            notes: "2 Sets: 20 reps",
+          },
+          {
+            name: "Straight-Arm Pulldown",
+            order_index: 5,
+            rest_timer_seconds: 60,
+            notes: "2 Sets: 20 reps",
+          },
+        ]
+      },
+    ]
   }
 ]
