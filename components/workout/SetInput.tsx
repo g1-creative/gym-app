@@ -3,16 +3,17 @@
 import { useState, useEffect } from 'react'
 import { SetInput as SetInputType } from '@/types'
 import { kgToLbs, lbsToKg } from '@/lib/utils/weight'
-import { Plus, Minus } from 'lucide-react'
+import { Plus, Minus, Calculator } from 'lucide-react'
 
 interface SetInputProps {
   onLog: (set: SetInputType) => void
   isLoading?: boolean
   defaultWeight?: number | null
   defaultReps?: number | null
+  onOpenCalculator?: () => void
 }
 
-export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps }: SetInputProps) {
+export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps, onOpenCalculator }: SetInputProps) {
   // Convert kg to lbs for display
   const defaultWeightLbs = defaultWeight ? kgToLbs(defaultWeight) : null
   const [weight, setWeight] = useState<string>(defaultWeightLbs?.toString() || '')
@@ -69,7 +70,19 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps 
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {/* Weight */}
         <div className="space-y-2">
-          <label className="block text-xs sm:text-sm font-medium text-zinc-300">Weight (lbs)</label>
+          <div className="flex items-center justify-between">
+            <label className="block text-xs sm:text-sm font-medium text-zinc-300">Weight (lbs)</label>
+            {onOpenCalculator && (
+              <button
+                type="button"
+                onClick={onOpenCalculator}
+                className="text-zinc-400 hover:text-zinc-200 transition-colors"
+                title="Smart Plates Calculator"
+              >
+                <Calculator className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"

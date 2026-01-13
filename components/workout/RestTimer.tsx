@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react'
 
 interface RestTimerProps {
   duration: number // in seconds
@@ -9,12 +9,35 @@ interface RestTimerProps {
   autoStart?: boolean
 }
 
-export function RestTimer({ duration, onComplete, onTimeUpdate, autoStart = false }: RestTimerProps) {
+export interface RestTimerRef {
+  start: () => void
+  pause: () => void
+  reset: () => void
+}
+
+export const RestTimer = forwardRef<RestTimerRef, RestTimerProps>(({ duration, onComplete, onTimeUpdate, autoStart = false }, ref) => {
   const [timeLeft, setTimeLeft] = useState(duration)
   const [isRunning, setIsRunning] = useState(autoStart)
   const [isComplete, setIsComplete] = useState(false)
   const [secondsElapsed, setSecondsElapsed] = useState(0)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useImperativeHandle(ref, () => ({
+    start: () => {
+      setIsRunning(true)
+      setIsComplete(false)
+    },
+    pause: () => {
+      setIsRunning(false)
+    },
+    reset: () => {
+      setTimeLeft(duration)
+      setIsRunning(false)
+      setIsComplete(false)
+      setSecondsElapsed(0)
+      if (onTimeUpdate) onTimeUpdate(0)
+    },
+  }))
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -143,6 +166,8 @@ export function RestTimer({ duration, onComplete, onTimeUpdate, autoStart = fals
       )}
     </div>
   )
-}
+})
+
+RestTimer.displayName = 'RestTimer'
 
 

@@ -1,17 +1,18 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import { WorkoutSessionWithSets } from '@/types'
 import { SetInput } from './SetInput'
-import { RestTimer } from './RestTimer'
+import { RestTimer, RestTimerRef } from './RestTimer'
 import { ExerciseSelector } from './ExerciseSelector'
 import { ProgressiveOverloadCard } from '@/components/analytics/ProgressiveOverloadCard'
+import { SmartPlatesCalculator } from './SmartPlatesCalculator'
 import { logSet, updateSet } from '@/app/actions/sets'
 import { completeSession, updateSession } from '@/app/actions/sessions'
 import { getProgressiveOverloadComparison } from '@/app/actions/analytics'
 import { useRouter } from 'next/navigation'
 import { SetWithExercise, ProgressiveOverloadComparison } from '@/types'
-import { Pencil, Save, X, Dumbbell, Clock } from 'lucide-react'
+import { Pencil, Save, X, Dumbbell, Clock, Copy, Calculator, TrendingUp } from 'lucide-react'
 import { initOfflineDB, savePendingOperation } from '@/lib/utils/offline'
 import { formatWeight, formatVolume, kgToLbs } from '@/lib/utils/weight'
 
@@ -32,6 +33,8 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
   const [sessionNotes, setSessionNotes] = useState(session.notes || '')
   const [isOnline, setIsOnline] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [showPlatesCalculator, setShowPlatesCalculator] = useState(false)
+  const restTimerRef = useRef<RestTimerRef>(null)
   const router = useRouter()
 
   // Check online status - only on client
@@ -138,11 +141,17 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
           }
         }
 
-        // Start rest timer
+        // Auto-start rest timer
         const workoutExercise = session.workout
           ? (session.workout as any).rest_timer_seconds
           : null
-        setRestTimerDuration(workoutExercise || 90)
+        const restDuration = workoutExercise || 90
+        setRestTimerDuration(restDuration)
+        // Reset and auto-start the rest timer
+        if (restTimerRef.current) {
+          restTimerRef.current.reset()
+          restTimerRef.current.start()
+        }
       } catch (error) {
         console.error('Error logging set:', error)
         alert('Failed to log set. Please try again.')
@@ -281,15 +290,20 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
         </header>
 
         <div className="space-y-4 sm:space-y-6">
-          {/* Progressive Overload Card */}
+          {/* Progressive Overload Card - More Prominent */}
           {progressiveOverload && (
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
+            <div className="bg-gradient-to-br from-green-500/10 to-blue-500/10 border-2 border-green-500/30 rounded-lg sm:rounded-xl p-4 sm:p-5 shadow-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="h-5 w-5 text-green-400" />
+                <h3 className="text-sm sm:text-base font-semibold text-white">Progress vs Last Session</h3>
+              </div>
               <ProgressiveOverloadCard comparison={progressiveOverload} />
             </div>
           )}
 
           {/* Rest Timer */}
           <RestTimer
+            ref={restTimerRef}
             duration={restTimerDuration}
             autoStart={false}
             onTimeUpdate={(seconds) => setRestSecondsElapsed(seconds)}
@@ -339,6 +353,10 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
                 groupedSets[selectedExercise]?.[groupedSets[selectedExercise].length - 1]?.reps ||
                 null
               }
+              onOpenCalculator={() => {
+                const lastSet = groupedSets[selectedExercise]?.[groupedSets[selectedExercise].length - 1]
+                setShowPlatesCalculator(true)
+              }}
             />
           )}
 
@@ -349,12 +367,12 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
               <div key={exerciseId} className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <h3 className="text-base sm:text-lg font-semibold mb-3">{exercise.name}</h3>
                 <div className="space-y-2">
-                  {sets.map((set) => (
+                  {sets.map((set, idx) => (
                     <div
                       key={set.id}
-                      className="flex items-center justify-between bg-zinc-900/50 rounded-lg p-2 sm:p-3"
+                      className="flex items-center justify-between bg-zinc-900/50 rounded-lg p-2 sm:p-3 group"
                     >
-                      <div className="flex items-center gap-2 sm:gap-4 flex-wrap text-xs sm:text-sm">
+                      <div className="flex items-center gap-2 sm:gap-4 flex-wrap text-xs sm:text-sm flex-1">
                         <span className="text-zinc-400 font-medium">Set {set.set_number}</span>
                         {set.weight && <span className="text-white font-semibold">{formatWeight(set.weight)}</span>}
                         {set.reps && <span className="text-white">{set.reps} reps</span>}
@@ -368,9 +386,28 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
                         {set.volume && (
                           <span className="text-white font-semibold bg-zinc-800 px-2 py-0.5 rounded">{formatVolume(set.volume)}</span>
                         )}
+                        {set.notes && (
+                          <span className="text-xs text-zinc-400">💬 {set.notes}</span>
+                        )}
                       </div>
-                      {set.notes && (
-                        <div className="text-xs text-zinc-400">💬 {set.notes}</div>
+                      {idx === sets.length - 1 && (
+                        <button
+                          onClick={() => {
+                            // Replicate last set
+                            const lastSet = set
+                            handleLogSet({
+                              weight: lastSet.weight,
+                              reps: lastSet.reps,
+                              rpe: lastSet.rpe || null,
+                              tempo: lastSet.tempo || null,
+                              notes: null,
+                            })
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-white ml-2"
+                          title="Replicate this set"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
                       )}
                     </div>
                   ))}
@@ -388,6 +425,22 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
         onSelect={(exerciseId) => {
           setSelectedExercise(exerciseId)
           setShowExerciseSelector(false)
+        }}
+      />
+
+      {/* Smart Plates Calculator */}
+      <SmartPlatesCalculator
+        isOpen={showPlatesCalculator}
+        onClose={() => setShowPlatesCalculator(false)}
+        targetWeight={
+          selectedExercise && groupedSets[selectedExercise]?.[groupedSets[selectedExercise].length - 1]?.weight
+            ? groupedSets[selectedExercise][groupedSets[selectedExercise].length - 1].weight
+            : null
+        }
+        onWeightSelect={(weightKg) => {
+          // This will be handled by updating the SetInput component
+          // For now, we'll just close the calculator
+          // The weight will need to be set via SetInput's internal state
         }}
       />
     </div>
