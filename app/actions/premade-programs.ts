@@ -16,8 +16,9 @@ export async function copyPremadeProgram(programId: string) {
   if (!user) throw new Error('Unauthorized')
 
   // Get the premade program with workouts and exercises
-  const { data: premadeProgram, error: programError } = await supabase
-    .from('programs')
+  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+  const query = supabase.from('programs') as any
+  const result = await query
     .select(`
       *,
       workouts(
@@ -33,8 +34,37 @@ export async function copyPremadeProgram(programId: string) {
     .is('deleted_at', null)
     .single()
 
-  if (programError || !premadeProgram) {
+  const { data, error: programError } = result
+
+  if (programError || !data) {
     throw new Error('Premade program not found')
+  }
+
+  // Type assertion for the premade program structure
+  const premadeProgram = data as {
+    id: string
+    name: string
+    description: string | null
+    workouts?: Array<{
+      id: string
+      name: string
+      description: string | null
+      order_index: number
+      rest_timer_seconds: number
+      workout_exercises?: Array<{
+        id: string
+        order_index: number
+        rest_timer_seconds: number | null
+        notes: string | null
+        exercise?: {
+          id: string
+          name: string
+          is_custom: boolean
+          muscle_groups: string[] | null
+          equipment: string | null
+        }
+      }>
+    }>
   }
 
   // Create new program for user
