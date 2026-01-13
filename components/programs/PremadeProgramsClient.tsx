@@ -22,8 +22,8 @@ export function PremadeProgramsClient({ programs, seedError }: PremadeProgramsCl
       try {
         const newProgram = await copyPremadeProgram(programId)
         setCopiedPrograms((prev) => new Set([...prev, programId]))
-        // Redirect to the new program
-        router.push(`/programs/${newProgram.id}`)
+        // Redirect to programs page to see the new program in the list
+        router.push('/programs')
         router.refresh()
       } catch (error) {
         console.error('Error adding program:', error)

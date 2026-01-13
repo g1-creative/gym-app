@@ -129,7 +129,9 @@ export async function copyPremadeProgram(programId: string) {
     }
   }
 
+  // Revalidate both programs list and the specific program page
   revalidatePath('/programs')
+  revalidatePath(`/programs/${newProgram.id}`)
   return newProgram
 }
 
