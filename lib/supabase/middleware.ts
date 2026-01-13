@@ -30,16 +30,16 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
+  // Get session from cookies (faster than getUser which makes API call)
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  const user = session?.user
 
   console.log('[MIDDLEWARE]', {
     path: request.nextUrl.pathname,
+    hasSession: !!session,
     hasUser: !!user,
     userId: user?.id
   })
