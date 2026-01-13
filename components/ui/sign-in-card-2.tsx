@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 import { cn } from "@/lib/utils"
 
@@ -66,40 +67,59 @@ export function Component() {
     setIsLoading(true);
     setError(null);
 
+    const supabase = createClient();
+
     try {
-      const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
-      console.log('[CLIENT] Calling API:', endpoint);
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      console.log('[CLIENT] API response status:', response.status);
-      const result = await response.json();
-      console.log('[CLIENT] API result:', result);
-      
-      if (!response.ok || result.error) {
-        console.log('[CLIENT] Error:', result.error);
-        setError(result.error || 'Authentication failed');
-        setIsLoading(false);
-        return;
+      if (isSignUp) {
+        console.log('[CLIENT] Signing up...');
+        const { data, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        
+        if (authError) {
+          console.log('[CLIENT] Signup error:', authError.message);
+          setError(authError.message);
+          setIsLoading(false);
+          return;
+        }
+        
+        // If session exists, they're logged in automatically (email confirmation disabled)
+        if (data.session) {
+          console.log('[CLIENT] Signup successful with session, redirecting...');
+          router.push('/');
+          router.refresh();
+        } else {
+          // Email confirmation required
+          alert('Please check your email to confirm your account.');
+          setIsSignUp(false);
+          setIsLoading(false);
+        }
+      } else {
+        console.log('[CLIENT] Signing in...');
+        const { data, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (authError) {
+          console.log('[CLIENT] Signin error:', authError.message);
+          setError(authError.message);
+          setIsLoading(false);
+          return;
+        }
+        
+        if (data.session) {
+          console.log('[CLIENT] Sign in successful, session established');
+          // Use router navigation instead of window.location
+          // This works better with Next.js middleware
+          router.push('/');
+          router.refresh();
+        } else {
+          setError('Failed to create session');
+          setIsLoading(false);
+        }
       }
-      
-      if (result.requiresConfirmation) {
-        console.log('[CLIENT] Email confirmation required');
-        alert(result.message || 'Please check your email to confirm your account.');
-        setIsSignUp(false);
-        setIsLoading(false);
-        return;
-      }
-      
-      console.log('[CLIENT] Auth successful, waiting for cookies then redirecting');
-      // Wait a moment for cookies to be set by browser
-      await new Promise(resolve => setTimeout(resolve, 100));
-      // Use window.location for a hard redirect after successful auth
-      window.location.href = '/';
     } catch (err: any) {
       console.error('[CLIENT] Exception during auth:', err);
       setError(err.message || 'An error occurred');
