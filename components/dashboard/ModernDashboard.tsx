@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { formatVolume } from '@/lib/utils/weight';
 
 interface DashboardProps {
   user: {
@@ -400,7 +401,7 @@ export default function ModernDashboard({
                             day: 'numeric'
                           })}
                           {session.total_volume && (
-                            <> • {session.total_volume.toFixed(0)} kg</>
+                            <> • {formatVolume(session.total_volume)}</>
                           )}
                         </p>
                       </div>
