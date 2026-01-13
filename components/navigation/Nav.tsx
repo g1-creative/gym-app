@@ -50,7 +50,7 @@ export function Nav() {
                 href={item.href}
                 className={`px-3 py-2 rounded-lg transition-colors ${
                   pathname === item.href
-                    ? 'bg-primary-600 text-white'
+                    ? 'bg-black text-white'
                     : 'text-slate-300 hover:bg-slate-700'
                 }`}
               >

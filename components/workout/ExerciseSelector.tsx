@@ -111,7 +111,7 @@ export function ExerciseSelector({ isOpen, onClose, onSelect }: ExerciseSelector
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 rounded-lg transition-colors"
+                  className="flex-1 bg-black hover:bg-zinc-900 text-white font-semibold py-2 rounded-lg transition-colors"
                 >
                   Create
                 </button>

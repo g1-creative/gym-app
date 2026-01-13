@@ -211,7 +211,7 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
             <button
               onClick={handleCompleteWorkout}
               disabled={isPending}
-              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 px-4 sm:px-6 py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base"
+              className="bg-black hover:bg-zinc-900 disabled:opacity-50 px-4 sm:px-6 py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base text-white"
             >
               Complete
             </button>
@@ -302,7 +302,7 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
                   }}
                   className={`px-3 sm:px-4 py-2 rounded-lg border transition-colors text-xs sm:text-sm ${
                     selectedExercise === exerciseId
-                      ? 'bg-primary-600 border-primary-500 text-white'
+                      ? 'bg-black border-zinc-700 text-white'
                       : 'bg-zinc-900/50 border-zinc-800 text-zinc-300 hover:bg-zinc-800'
                   }`}
                 >

@@ -335,7 +335,7 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
                       <Button
                         onClick={() => handleStartWorkout(workout.id)}
                         disabled={isPending}
-                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto bg-green-600 hover:bg-green-700"
+                        className="text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto bg-black hover:bg-zinc-900 text-white"
                       >
                         <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </Button>

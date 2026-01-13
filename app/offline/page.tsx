@@ -10,7 +10,7 @@ export default function OfflinePage() {
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+          className="bg-black hover:bg-zinc-900 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
         >
           Retry
         </button>
