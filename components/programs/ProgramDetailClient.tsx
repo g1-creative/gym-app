@@ -73,13 +73,21 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
         formData.append('rest_timer_seconds', restTimerSeconds.toString())
 
         if (editingWorkout) {
-          await updateWorkout(editingWorkout.id, formData)
+          const updated = await updateWorkout(editingWorkout.id, formData) as any
+          // Update local state immediately
+          setWorkouts((prev) =>
+            prev.map((w) => (w.id === editingWorkout.id ? updated : w))
+              .sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+          )
         } else {
-          await createWorkout(formData)
+          const newWorkout = await createWorkout(formData) as any
+          // Add to local state immediately and sort
+          setWorkouts((prev) => {
+            const updated = [...prev, newWorkout]
+            return updated.sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+          })
         }
 
-        // Refresh workouts
-        router.refresh()
         setShowWorkoutForm(false)
         setEditingWorkout(null)
         setWorkoutName('')
@@ -97,7 +105,8 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
       startTransition(async () => {
         try {
           await deleteWorkout(workoutId)
-          router.refresh()
+          // Remove from local state immediately
+          setWorkouts((prev) => prev.filter((w) => w.id !== workoutId))
         } catch (error) {
           console.error('Error deleting workout:', error)
           alert('Failed to delete workout')
