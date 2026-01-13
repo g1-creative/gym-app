@@ -84,7 +84,10 @@ export function Component() {
         
         // If session exists, they're logged in automatically (email confirmation disabled)
         if (data.session) {
-          console.log('[CLIENT] Signup successful with session, redirecting...');
+          console.log('[CLIENT] Signup successful with session');
+          console.log('[CLIENT] Waiting for cookies to be written...');
+          await new Promise(resolve => setTimeout(resolve, 500));
+          console.log('[CLIENT] Redirecting to dashboard...');
           window.location.href = '/';
         } else {
           // Email confirmation required
@@ -107,7 +110,11 @@ export function Component() {
         }
         
         if (data.session) {
-          console.log('[CLIENT] Sign in successful, redirecting with hard reload...');
+          console.log('[CLIENT] Sign in successful, session established');
+          console.log('[CLIENT] Waiting for cookies to be written...');
+          // Wait for cookies to be written by browser before redirecting
+          await new Promise(resolve => setTimeout(resolve, 500));
+          console.log('[CLIENT] Redirecting to dashboard...');
           // Use window.location for hard redirect - ensures middleware sees new cookies
           window.location.href = '/';
         } else {
