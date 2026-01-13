@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Nav } from '@/components/navigation/Nav'
+import BottomNavBar from '@/components/ui/bottom-nav-bar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -42,8 +43,20 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
-          <Nav />
-          {children}
+          {/* Desktop navigation - hidden on mobile */}
+          <div className="hidden md:block">
+            <Nav />
+          </div>
+          
+          {/* Main content with bottom padding on mobile for nav bar */}
+          <div className="pb-20 md:pb-0">
+            {children}
+          </div>
+          
+          {/* Mobile bottom navigation - hidden on desktop */}
+          <div className="md:hidden">
+            <BottomNavBar stickyBottom />
+          </div>
         </Providers>
       </body>
     </html>

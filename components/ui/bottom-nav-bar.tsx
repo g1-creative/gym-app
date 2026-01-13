@@ -1,42 +1,44 @@
 "use client";
 
-import { useState } from "react";
-
 import { motion } from "framer-motion";
 import {
   Home,
   LineChart,
-  CreditCard,
-  MessageCircle,
-  Trophy,
-  User,
+  ClipboardList,
+  Calendar,
 } from "lucide-react";
-
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { label: "Home", icon: Home },
-  { label: "Portfolio", icon: LineChart },
-  { label: "Transactions", icon: CreditCard },
-  { label: "Messages", icon: MessageCircle },
-  { label: "Rewards", icon: Trophy },
-  { label: "Profile", icon: User },
+  { label: "Home", icon: Home, href: "/" },
+  { label: "Programs", icon: Calendar, href: "/programs" },
+  { label: "History", icon: ClipboardList, href: "/history" },
+  { label: "Analytics", icon: LineChart, href: "/analytics" },
 ];
 
 const MOBILE_LABEL_WIDTH = 72;
 
 type BottomNavBarProps = {
   className?: string;
-  defaultIndex?: number;
   stickyBottom?: boolean;
 };
 
 export function BottomNavBar({
   className,
-  defaultIndex = 0,
   stickyBottom = false,
 }: BottomNavBarProps) {
-  const [activeIndex, setActiveIndex] = useState(defaultIndex);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Find active index based on current pathname
+  const activeIndex = navItems.findIndex(item => 
+    pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+  );
+
+  const handleNavigation = (href: string) => {
+    router.push(href);
+  };
 
   return (
     <motion.nav
@@ -66,7 +68,7 @@ export function BottomNavBar({
                 : "bg-transparent text-muted-foreground dark:text-muted-foreground hover:bg-muted dark:hover:bg-muted",
               "focus:outline-none focus-visible:ring-0",
             )}
-            onClick={() => setActiveIndex(idx)}
+            onClick={() => handleNavigation(item.href)}
             aria-label={item.label}
             type="button"
           >
