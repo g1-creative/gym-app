@@ -77,56 +77,104 @@ export async function copyPremadeProgram(programId: string) {
 
   // Copy workouts
   const workouts = premadeProgram.workouts || []
+  const createdWorkouts = []
+  
   for (const workout of workouts) {
-    const workoutFormData = new FormData()
-    workoutFormData.append('program_id', newProgram.id)
-    workoutFormData.append('name', workout.name)
-    workoutFormData.append('description', workout.description || '')
-    workoutFormData.append('order_index', workout.order_index?.toString() || '0')
-    workoutFormData.append('rest_timer_seconds', workout.rest_timer_seconds?.toString() || '90')
+    try {
+      const workoutFormData = new FormData()
+      workoutFormData.append('program_id', newProgram.id)
+      workoutFormData.append('name', workout.name)
+      workoutFormData.append('description', workout.description || '')
+      workoutFormData.append('order_index', workout.order_index?.toString() || '0')
+      workoutFormData.append('rest_timer_seconds', workout.rest_timer_seconds?.toString() || '90')
 
-    const newWorkout = await createWorkout(workoutFormData) as { id: string; name: string; description: string | null; program_id: string }
-
-    // Copy workout exercises
-    const workoutExercises = workout.workout_exercises || []
-    for (const we of workoutExercises) {
-      // First, ensure the exercise exists (create if custom, or use existing)
-      let exerciseId = we.exercise?.id
+      const newWorkout = await createWorkout(workoutFormData) as { id: string; name: string; description: string | null; program_id: string }
       
-      if (we.exercise?.is_custom) {
-        // Create custom exercise for user
-        // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-        const exerciseQuery = supabase.from('exercises') as any
-        const { data: newExercise } = await exerciseQuery
-          .insert({
-            user_id: user.id,
-            name: we.exercise.name,
-            muscle_groups: we.exercise.muscle_groups,
-            equipment: we.exercise.equipment,
-            is_custom: true,
-          })
-          .select()
-          .single()
-        
-        if (newExercise) {
-          exerciseId = newExercise.id
+      if (!newWorkout || !newWorkout.id) {
+        console.error(`Failed to create workout: ${workout.name}`)
+        continue
+      }
+
+      createdWorkouts.push(newWorkout)
+
+      // Copy workout exercises
+      const workoutExercises = workout.workout_exercises || []
+      for (const we of workoutExercises) {
+        try {
+          // First, ensure the exercise exists (create if custom, or use existing)
+          let exerciseId = we.exercise?.id
+          
+          if (!exerciseId && we.exercise?.name) {
+            // Try to find existing exercise by name
+            const findExerciseQuery = supabase.from('exercises') as any
+            const { data: existingExercise } = await findExerciseQuery
+              .select('id')
+              .eq('name', we.exercise.name)
+              .is('deleted_at', null)
+              .maybeSingle()
+            
+            if (existingExercise) {
+              exerciseId = existingExercise.id
+            }
+          }
+          
+          if (we.exercise?.is_custom && !exerciseId) {
+            // Create custom exercise for user
+            // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+            const exerciseQuery = supabase.from('exercises') as any
+            const { data: newExercise, error: exerciseError } = await exerciseQuery
+              .insert({
+                user_id: user.id,
+                name: we.exercise.name,
+                muscle_groups: we.exercise.muscle_groups,
+                equipment: we.exercise.equipment,
+                is_custom: true,
+              })
+              .select()
+              .single()
+            
+            if (exerciseError) {
+              console.error(`Error creating exercise ${we.exercise.name}:`, exerciseError)
+              continue
+            }
+            
+            if (newExercise) {
+              exerciseId = newExercise.id
+            }
+          }
+
+          if (exerciseId) {
+            // Create workout_exercise link
+            // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+            const workoutExerciseQuery = supabase.from('workout_exercises') as any
+            const { error: weError } = await workoutExerciseQuery
+              .insert({
+                workout_id: newWorkout.id,
+                exercise_id: exerciseId,
+                order_index: we.order_index || 0,
+                rest_timer_seconds: we.rest_timer_seconds,
+                notes: we.notes,
+              })
+            
+            if (weError) {
+              console.error(`Error linking exercise to workout:`, weError)
+            }
+          } else {
+            console.warn(`No exercise ID found for: ${we.exercise?.name || 'unknown'}`)
+          }
+        } catch (exerciseError) {
+          console.error(`Error processing exercise in workout ${workout.name}:`, exerciseError)
+          // Continue with next exercise
         }
       }
-
-      if (exerciseId) {
-        // Create workout_exercise link
-        // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-        const workoutExerciseQuery = supabase.from('workout_exercises') as any
-        await workoutExerciseQuery
-          .insert({
-            workout_id: newWorkout.id,
-            exercise_id: exerciseId,
-            order_index: we.order_index || 0,
-            rest_timer_seconds: we.rest_timer_seconds,
-            notes: we.notes,
-          })
-      }
+    } catch (workoutError) {
+      console.error(`Error creating workout ${workout.name}:`, workoutError)
+      // Continue with next workout
     }
+  }
+  
+  if (createdWorkouts.length === 0) {
+    throw new Error('Failed to create any workouts for the program')
   }
 
   // Revalidate both programs list and the specific program page
