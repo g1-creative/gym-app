@@ -37,17 +37,22 @@ export function PremadeProgramsClient({ programs }: PremadeProgramsClientProps) 
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-6 sm:p-8">
           <Sparkles className="h-12 w-12 text-zinc-400 mx-auto mb-4" />
           <p className="text-base sm:text-lg text-zinc-300 mb-2">No premade programs available</p>
-          <p className="text-sm text-zinc-500 mb-4">
-            Programs may not be seeded yet. Visit{' '}
-            <Link href="/admin/seed-programs" className="text-blue-400 hover:underline">
-              /admin/seed-programs
-            </Link>{' '}
-            to add premade programs to the database.
-          </p>
-          <div className="flex gap-2 justify-center">
+          <div className="text-sm text-zinc-500 mb-4 space-y-2">
+            <p>
+              The premade programs are hardcoded in the app but need to be added to the database.
+            </p>
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-left mt-4">
+              <p className="text-xs text-blue-400 font-semibold mb-2">Setup Required:</p>
+              <ol className="text-xs text-zinc-400 space-y-1 list-decimal list-inside">
+                <li>Run the database migration (add is_premade column) - See PREMADE_PROGRAMS_SETUP.md</li>
+                <li>Programs will auto-seed when you visit this page, or manually seed at /admin/seed-programs</li>
+              </ol>
+            </div>
+          </div>
+          <div className="flex gap-2 justify-center flex-wrap">
             <Link href="/admin/seed-programs">
               <Button className="text-sm sm:text-base">
-                Seed Programs
+                Manual Seed
               </Button>
             </Link>
             <Link href="/programs">
