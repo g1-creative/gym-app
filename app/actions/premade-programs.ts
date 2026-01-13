@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { createProgram } from './programs'
 import { createWorkout } from './workouts'
 
@@ -177,10 +178,9 @@ export async function copyPremadeProgram(programId: string) {
     throw new Error('Failed to create any workouts for the program')
   }
 
-  // Revalidate both programs list and the specific program page
+  // Revalidate and redirect to programs list
   revalidatePath('/programs')
-  revalidatePath(`/programs/${newProgram.id}`)
-  return newProgram
+  redirect('/programs')
 }
 
 /**
