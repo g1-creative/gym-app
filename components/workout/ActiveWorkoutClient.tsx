@@ -12,7 +12,7 @@ import { completeSession, updateSession } from '@/app/actions/sessions'
 import { getProgressiveOverloadComparison } from '@/app/actions/analytics'
 import { useRouter } from 'next/navigation'
 import { SetWithExercise, ProgressiveOverloadComparison } from '@/types'
-import { Pencil, Save, X, Dumbbell, Clock, Copy, Calculator, TrendingUp } from 'lucide-react'
+import { Pencil, Save, X, Dumbbell, Clock, Copy, Calculator, TrendingUp, Plus } from 'lucide-react'
 import { initOfflineDB, savePendingOperation } from '@/lib/utils/offline'
 import { formatWeight, formatVolume, kgToLbs } from '@/lib/utils/weight'
 
@@ -152,6 +152,9 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
           restTimerRef.current.reset()
           restTimerRef.current.start()
         }
+
+        // Hide the form after logging the set
+        setSelectedExercise(null)
       } catch (error) {
         console.error('Error logging set:', error)
         alert('Failed to log set. Please try again.')
@@ -393,20 +396,13 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
                       {idx === sets.length - 1 && (
                         <button
                           onClick={() => {
-                            // Replicate last set
-                            const lastSet = set
-                            handleLogSet({
-                              weight: lastSet.weight,
-                              reps: lastSet.reps,
-                              rpe: lastSet.rpe || null,
-                              tempo: lastSet.tempo || null,
-                              notes: null,
-                            })
+                            // Select this exercise and show form to log another set
+                            setSelectedExercise(exerciseId)
                           }}
                           className="opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-white ml-2"
-                          title="Replicate this set"
+                          title="Add another set"
                         >
-                          <Copy className="h-4 w-4" />
+                          <Plus className="h-4 w-4" />
                         </button>
                       )}
                     </div>
