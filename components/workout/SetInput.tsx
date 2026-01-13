@@ -67,7 +67,7 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
   return (
     <form onSubmit={handleSubmit} className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-4 sm:p-5 space-y-4 sm:space-y-5">
       {/* Weight and Reps - Main Input */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4">
         {/* Weight */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -87,7 +87,7 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
             <button
               type="button"
               onClick={() => incrementWeight(-5)}
-              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px]"
+              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px] flex-shrink-0"
             >
               <Minus className="h-4 w-4" />
             </button>
@@ -96,13 +96,13 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
               step="5"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-center text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
+              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-center text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500 min-w-0"
               placeholder="0"
             />
             <button
               type="button"
               onClick={() => incrementWeight(5)}
-              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px]"
+              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px] flex-shrink-0"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -111,14 +111,14 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
             <button
               type="button"
               onClick={() => incrementWeight(-2.5)}
-              className="text-xs text-zinc-400 hover:text-zinc-300 px-2 py-1"
+              className="text-xs text-zinc-400 hover:text-zinc-300 px-2 py-1 transition-colors"
             >
               -2.5
             </button>
             <button
               type="button"
               onClick={() => incrementWeight(2.5)}
-              className="text-xs text-zinc-400 hover:text-zinc-300 px-2 py-1"
+              className="text-xs text-zinc-400 hover:text-zinc-300 px-2 py-1 transition-colors"
             >
               +2.5
             </button>
@@ -132,7 +132,7 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
             <button
               type="button"
               onClick={() => incrementReps(-1)}
-              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px]"
+              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px] flex-shrink-0"
             >
               <Minus className="h-4 w-4" />
             </button>
@@ -140,13 +140,13 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
               type="number"
               value={reps}
               onChange={(e) => setReps(e.target.value)}
-              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-center text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
+              className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-center text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500 min-w-0"
               placeholder="0"
             />
             <button
               type="button"
               onClick={() => incrementReps(1)}
-              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px]"
+              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-2 sm:px-3 py-2 rounded-lg transition-colors flex items-center justify-center min-w-[44px] flex-shrink-0"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -155,9 +155,9 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
       </div>
 
       {/* RPE and Tempo */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <div>
-          <label className="block text-xs sm:text-sm font-medium text-zinc-300 mb-1.5 sm:mb-2">RPE (1-10)</label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="block text-xs sm:text-sm font-medium text-zinc-300">RPE (1-10)</label>
           <input
             type="number"
             min="1"
@@ -165,30 +165,30 @@ export function SetInput({ onLog, isLoading = false, defaultWeight, defaultReps,
             step="0.5"
             value={rpe}
             onChange={(e) => setRpe(e.target.value)}
-            className="w-full px-3 sm:px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
             placeholder="Optional"
           />
         </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-medium text-zinc-300 mb-1.5 sm:mb-2">Tempo</label>
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="block text-xs sm:text-sm font-medium text-zinc-300">Tempo</label>
           <input
             type="text"
             value={tempo}
             onChange={(e) => setTempo(e.target.value)}
-            className="w-full px-3 sm:px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
             placeholder="2-0-1-0"
           />
         </div>
       </div>
 
       {/* Notes */}
-      <div>
-        <label className="block text-xs sm:text-sm font-medium text-zinc-300 mb-1.5 sm:mb-2">Notes</label>
+      <div className="space-y-1.5 sm:space-y-2">
+        <label className="block text-xs sm:text-sm font-medium text-zinc-300">Notes</label>
         <input
           type="text"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
+          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 placeholder:text-zinc-500"
           placeholder="Quick note..."
         />
       </div>
