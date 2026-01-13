@@ -10,23 +10,23 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          const allCookies = cookieStore.getAll()
-          console.log('[SERVER COOKIES] getAll called, count:', allCookies.length)
-          return allCookies
+        get(name: string) {
+          return cookieStore.get(name)?.value
         },
-        setAll(cookiesToSet: any) {
+        set(name: string, value: string, options: any) {
           try {
-            console.log('[SERVER COOKIES] setAll called, setting', cookiesToSet.length, 'cookies')
-            cookiesToSet.forEach(({ name, value, options }: any) => {
-              console.log('[SERVER COOKIES] Setting cookie:', name, 'with options:', options)
-              cookieStore.set(name, value, options)
-            })
+            cookieStore.set(name, value, options)
           } catch (error) {
-            console.error('[SERVER COOKIES] Error setting cookies:', error)
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing user sessions.
+          }
+        },
+        remove(name: string, options: any) {
+          try {
+            cookieStore.set(name, '', options)
+          } catch (error) {
+            // The `remove` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing user sessions.
           }
         },
       },
