@@ -4,6 +4,9 @@ import { useState, useTransition } from 'react'
 import { Program } from '@/types'
 import { createSession } from '@/app/actions/sessions'
 import { useRouter } from 'next/navigation'
+import { PageLayout } from '@/components/layout/PageLayout'
+import { Button } from '@/components/ui/button'
+import { PlayCircle } from 'lucide-react'
 
 interface NewWorkoutClientProps {
   programs: Program[]
@@ -33,13 +36,14 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <h1 className="text-3xl font-bold mb-6">Start New Workout</h1>
-
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-6">
+    <PageLayout
+      title="Start New Workout"
+      subtitle={programs.length > 0 ? `Choose from ${programs.length} ${programs.length === 1 ? 'program' : 'programs'}` : 'Start a freestyle workout'}
+    >
+      <div className="space-y-4 sm:space-y-6">
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-zinc-300 mb-2">
               Select Program (Optional)
             </label>
             <select
@@ -48,7 +52,7 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
                 setSelectedProgram(e.target.value || null)
                 setSelectedWorkout(null)
               }}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Freestyle Workout</option>
               {programs.map((program) => (
@@ -57,18 +61,23 @@ export function NewWorkoutClient({ programs }: NewWorkoutClientProps) {
                 </option>
               ))}
             </select>
+            <p className="text-xs text-zinc-500 mt-1">
+              Leave empty to start a freestyle workout without a program
+            </p>
           </div>
-
-          <button
-            onClick={handleStart}
-            disabled={isPending}
-            className="w-full bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors"
-          >
-            {isPending ? 'Starting...' : 'Start Workout'}
-          </button>
         </div>
+
+        <Button
+          onClick={handleStart}
+          disabled={isPending}
+          className="w-full text-xs sm:text-sm"
+          size="lg"
+        >
+          <PlayCircle className="h-4 w-4 mr-2" />
+          {isPending ? 'Starting...' : 'Start Workout'}
+        </Button>
       </div>
-    </div>
+    </PageLayout>
   )
 }
 
