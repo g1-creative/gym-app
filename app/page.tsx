@@ -11,12 +11,14 @@ export const revalidate = 0
 export default async function HomePage() {
   const supabase = await createClient()
   
-  // Route protection: Check auth in page, not middleware
-  const { data: { user } } = await supabase.auth.getUser()
+  // Route protection: Check session from cookies (faster than getUser API call)
+  const { data: { session } } = await supabase.auth.getSession()
 
-  if (!user) {
+  if (!session) {
     redirect('/login')
   }
+  
+  const user = session.user
 
   const [activeSession, recentSessions, programs] = await Promise.all([
     getActiveSession(),
