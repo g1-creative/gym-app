@@ -77,17 +77,22 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
 
   const handleDeleteProgram = async () => {
     if (confirm('Delete this program? This will also delete all associated workouts. This cannot be undone.')) {
-      startTransition(async () => {
-        try {
-          await deleteProgram(program.id)
-          // Navigate away immediately - no need to refresh since we're leaving the page
-          router.push('/programs')
-        } catch (error: any) {
-          console.error('Error deleting program:', error)
-          const errorMessage = error?.message || 'Failed to delete program. Please try again.'
-          alert(errorMessage)
-        }
-      })
+      try {
+        // Delete the program
+        await deleteProgram(program.id)
+        
+        // Small delay to ensure deletion completes and avoid race conditions
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // Use window.location.href for immediate full-page navigation
+        // This prevents Next.js from trying to re-render the current page component
+        // which would fail because the program is now deleted
+        window.location.href = '/programs'
+      } catch (error: any) {
+        console.error('Error deleting program:', error)
+        const errorMessage = error?.message || 'Failed to delete program. Please try again.'
+        alert(errorMessage)
+      }
     }
   }
 

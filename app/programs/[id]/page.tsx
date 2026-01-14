@@ -1,4 +1,4 @@
-import { redirect, notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getProgram } from '@/app/actions/programs'
 import { getWorkoutsForProgram } from '@/app/actions/workouts'
@@ -19,12 +19,19 @@ export default async function ProgramDetailPage({ params }: { params: { id: stri
     ])
 
     if (!program) {
-      notFound()
+      redirect('/programs')
     }
 
     return <ProgramDetailClient program={program} workouts={workouts} />
-  } catch (error) {
-    // Program not found or deleted - redirect to programs list
+  } catch (error: any) {
+    // Log error for debugging
+    console.error('[PROGRAM PAGE] Error loading program:', {
+      error: error?.message,
+      programId: params.id,
+      code: error?.code
+    })
+    
+    // Program not found, deleted, or error - redirect to programs list
     redirect('/programs')
   }
 }
