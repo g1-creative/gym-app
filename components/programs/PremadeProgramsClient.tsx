@@ -20,15 +20,14 @@ export function PremadeProgramsClient({ programs, seedError }: PremadeProgramsCl
   const handleAddProgram = async (programId: string) => {
     startTransition(async () => {
       try {
-        await copyPremadeProgram(programId)
+        const result = await copyPremadeProgram(programId)
         setCopiedPrograms((prev) => new Set([...prev, programId]))
-        // The server action will redirect automatically
+        // Redirect to programs page
+        router.push('/programs')
+        router.refresh()
       } catch (error: any) {
         console.error('Error adding program:', error)
-        // Only show error if redirect didn't happen
-        if (!error?.message?.includes('NEXT_REDIRECT')) {
-          alert('Failed to add program. Please try again.')
-        }
+        alert('Failed to add program. Please try again.')
       }
     })
   }

@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 const programSchema = z.object({
@@ -124,7 +123,7 @@ export async function deleteProgram(id: string) {
   }
 
   revalidatePath('/programs')
-  redirect('/programs')
+  return { success: true, id }
 }
 
 export async function getPrograms() {

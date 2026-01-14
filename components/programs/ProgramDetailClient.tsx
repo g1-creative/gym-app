@@ -80,14 +80,12 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
       startTransition(async () => {
         try {
           await deleteProgram(program.id)
-          // The server action will redirect automatically
+          router.push('/programs')
+          router.refresh()
         } catch (error: any) {
           console.error('Error deleting program:', error)
-          // Only show error if redirect didn't happen
-          if (!error?.message?.includes('NEXT_REDIRECT')) {
-            const errorMessage = error?.message || 'Failed to delete program. Please try again.'
-            alert(errorMessage)
-          }
+          const errorMessage = error?.message || 'Failed to delete program. Please try again.'
+          alert(errorMessage)
         }
       })
     }
