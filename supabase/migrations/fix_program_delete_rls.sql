@@ -17,3 +17,6 @@ CREATE POLICY "Users can update own programs" ON programs
   USING (auth.uid() = user_id)  -- User must own the program (checks OLD row)
   WITH CHECK (auth.uid() = user_id);  -- After update, must still belong to user (allows setting deleted_at)
 
+-- Verify the policy was created correctly
+-- Run this query to check: SELECT * FROM pg_policies WHERE tablename = 'programs' AND policyname = 'Users can update own programs';
+

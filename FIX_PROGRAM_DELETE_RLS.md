@@ -48,12 +48,39 @@ CREATE POLICY "Users can update own programs" ON programs
 
 ## Verify It Worked
 
-After running the migration, try deleting a program. It should work without the 42501 error.
+**Step 1: Verify the policy was updated**
+
+Run this query in Supabase SQL Editor to check the policies:
+
+```sql
+SELECT 
+  policyname,
+  cmd,
+  qual as using_clause,
+  with_check as with_check_clause
+FROM pg_policies 
+WHERE tablename = 'programs' AND policyname = 'Users can update own programs';
+```
+
+You should see:
+- `cmd` = `UPDATE`
+- `using_clause` contains `auth.uid() = user_id`
+- `with_check_clause` contains `auth.uid() = user_id` (THIS MUST NOT BE NULL!)
+
+**Step 2: Test deletion**
+
+After verifying the policy, try deleting a program. It should work without the 42501 error.
 
 ## If You Still Get Errors
 
-If you still see RLS errors, check:
-1. The user is authenticated (check Vercel logs for auth errors)
-2. The program belongs to the user (check `user_id` matches `auth.uid()`)
-3. The program isn't already deleted (check `deleted_at IS NULL`)
+If you still see RLS errors after running the migration:
+
+1. **Verify the migration ran**: Check that the policy has a `with_check_clause` (see verification query above)
+2. **Check authentication**: Verify the user is authenticated (check Vercel logs for auth errors)
+3. **Check ownership**: Verify the program belongs to the user (check `user_id` matches `auth.uid()`)
+4. **Check if already deleted**: Verify the program isn't already deleted (check `deleted_at IS NULL`)
+
+## Troubleshooting
+
+If the `with_check_clause` is NULL after running the migration, try running it again. Sometimes Supabase needs the policy to be dropped and recreated.
 
