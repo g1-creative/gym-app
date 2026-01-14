@@ -183,9 +183,10 @@ export async function deleteProgram(id: string) {
 
     console.log(`[DELETE PROGRAM] Successfully deleted program ${id}`)
 
-    // Step 6: Revalidate paths
+    // Step 6: Revalidate the programs list page
+    // Note: We don't revalidate /programs/${id} because the program is deleted
+    // and trying to revalidate a deleted program's page causes errors
     revalidatePath('/programs')
-    revalidatePath(`/programs/${id}`)
 
     return { success: true, id }
   } catch (error: any) {
