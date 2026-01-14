@@ -99,8 +99,13 @@ export async function deleteWorkout(id: string) {
   try {
     const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Unauthorized')
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      console.error('[DELETE WORKOUT] Auth error:', { authError, hasUser: !!user })
+      throw new Error('Unauthorized')
+    }
+
+    console.log('[DELETE WORKOUT] Starting deletion:', { workoutId: id, userId: user.id })
 
     // Type assertion needed due to Supabase TypeScript inference limitations with SSR
     const selectQuery = supabase.from('workouts') as any
@@ -110,6 +115,14 @@ export async function deleteWorkout(id: string) {
       .single()
 
     const workout = selectResult.data as { program_id: string; programs: { user_id: string } } | null
+    
+    console.log('[DELETE WORKOUT] Workout lookup result:', { 
+      found: !!workout,
+      programOwner: workout?.programs?.user_id,
+      currentUser: user.id,
+      matches: workout?.programs?.user_id === user.id
+    })
+    
     if (!workout || workout.programs.user_id !== user.id) {
       throw new Error('Workout not found')
     }
