@@ -106,23 +106,18 @@ export async function deleteProgram(id: string) {
 
   // Soft delete the program
   const query = supabase.from('programs') as any
-  const { data, error } = await query
+  const { error } = await query
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id)
     .eq('user_id', user.id)
-    .select()
-    .single()
 
   if (error) {
     console.error('Error deleting program:', error)
     throw new Error(`Failed to delete program: ${error.message || 'Unknown error'}`)
   }
 
-  if (!data) {
-    throw new Error('Program deletion failed: No data returned')
-  }
-
   revalidatePath('/programs')
+  revalidatePath(`/programs/${id}`)
   return { success: true, id }
 }
 

@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getProgram } from '@/app/actions/programs'
 import { getWorkoutsForProgram } from '@/app/actions/workouts'
@@ -12,11 +12,20 @@ export default async function ProgramDetailPage({ params }: { params: { id: stri
     redirect('/login')
   }
 
-  const [program, workouts] = await Promise.all([
-    getProgram(params.id),
-    getWorkoutsForProgram(params.id),
-  ])
+  try {
+    const [program, workouts] = await Promise.all([
+      getProgram(params.id),
+      getWorkoutsForProgram(params.id),
+    ])
 
-  return <ProgramDetailClient program={program} workouts={workouts} />
+    if (!program) {
+      notFound()
+    }
+
+    return <ProgramDetailClient program={program} workouts={workouts} />
+  } catch (error) {
+    // Program not found or deleted - redirect to programs list
+    redirect('/programs')
+  }
 }
 

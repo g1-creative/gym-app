@@ -80,8 +80,8 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
       startTransition(async () => {
         try {
           await deleteProgram(program.id)
+          // Navigate away immediately - no need to refresh since we're leaving the page
           router.push('/programs')
-          router.refresh()
         } catch (error: any) {
           console.error('Error deleting program:', error)
           const errorMessage = error?.message || 'Failed to delete program. Please try again.'
