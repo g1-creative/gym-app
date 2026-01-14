@@ -138,12 +138,15 @@ export function ProgramDetailClient({ program: initialProgram, workouts: initial
     if (confirm('Delete this workout?')) {
       startTransition(async () => {
         try {
-          await deleteWorkout(workoutId)
+          const result = await deleteWorkout(workoutId)
           // Remove from local state immediately
           setWorkouts((prev) => prev.filter((w) => w.id !== workoutId))
-        } catch (error) {
+          // Refresh the page data in the background
+          router.refresh()
+        } catch (error: any) {
           console.error('Error deleting workout:', error)
-          alert('Failed to delete workout')
+          const errorMessage = error?.message || 'Failed to delete workout. Please try again.'
+          alert(errorMessage)
         }
       })
     }

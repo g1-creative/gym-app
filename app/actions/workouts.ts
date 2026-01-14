@@ -96,32 +96,53 @@ export async function updateWorkout(id: string, formData: FormData) {
 }
 
 export async function deleteWorkout(id: string) {
-  const supabase = await createClient()
+  try {
+    const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Unauthorized')
 
-  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const selectQuery = supabase.from('workouts') as any
-  const selectResult = await selectQuery
-    .select('program_id, programs!inner(user_id)')
-    .eq('id', id)
-    .single()
+    // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+    const selectQuery = supabase.from('workouts') as any
+    const selectResult = await selectQuery
+      .select('program_id, programs!inner(user_id)')
+      .eq('id', id)
+      .single()
 
-  const workout = selectResult.data as { program_id: string; programs: { user_id: string } } | null
-  if (!workout || workout.programs.user_id !== user.id) {
-    throw new Error('Workout not found')
+    const workout = selectResult.data as { program_id: string; programs: { user_id: string } } | null
+    if (!workout || workout.programs.user_id !== user.id) {
+      throw new Error('Workout not found')
+    }
+
+    // Type assertion needed due to Supabase TypeScript inference limitations with SSR
+    const updateQuery = supabase.from('workouts') as any
+    const { error } = await updateQuery
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+
+    if (error) {
+      console.error('[DELETE WORKOUT] Error:', {
+        error,
+        code: error.code,
+        message: error.message,
+        workoutId: id
+      })
+      throw new Error(`Failed to delete workout: ${error.message}`)
+    }
+
+    console.log(`[DELETE WORKOUT] Successfully deleted workout ${id}`)
+
+    // Don't revalidate during the action - let the client component handle UI updates
+    // revalidatePath is called after the client updates state to avoid conflicts
+    return { success: true, programId: workout.program_id }
+  } catch (error: any) {
+    console.error('[DELETE WORKOUT] Fatal error:', {
+      message: error?.message,
+      stack: error?.stack,
+      workoutId: id
+    })
+    throw error
   }
-
-  // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-  const updateQuery = supabase.from('workouts') as any
-  const { error } = await updateQuery
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('id', id)
-
-  if (error) throw error
-
-  revalidatePath(`/programs/${workout.program_id}`)
 }
 
 export async function getWorkout(id: string) {
