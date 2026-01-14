@@ -55,10 +55,28 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
     }
   }, [])
 
+  // Combine exercises from logged sets and workout template
+  const templateExercises = (session.workout?.workout_exercises || [])
+    .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+    .map((we: any) => ({
+      id: we.exercise_id,
+      exercise: we.exercise,
+      order: we.order_index || 0,
+      notes: we.notes,
+      rest_timer_seconds: we.rest_timer_seconds
+    }))
+
+  const loggedExerciseIds = new Set(session.sets.map(set => set.exercise_id))
+  
   const exercises = Array.from(
-    new Map(
-      session.sets.map((set) => [set.exercise_id, (set as SetWithExercise).exercise])
-    ).entries()
+    new Map([
+      // Add template exercises
+      ...templateExercises.map((te: any) => [te.id, te.exercise]),
+      // Add any exercises from logged sets not in template
+      ...session.sets
+        .filter(set => !templateExercises.find((te: any) => te.id === set.exercise_id))
+        .map((set) => [set.exercise_id, (set as SetWithExercise).exercise])
+    ]).entries()
   )
 
   const handleLogSet = async (setData: any) => {

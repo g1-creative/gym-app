@@ -146,7 +146,13 @@ export async function getActiveSession() {
         exercise:exercises(*)
       ),
       program:programs(*),
-      workout:workouts(*)
+      workout:workouts(
+        *,
+        workout_exercises(
+          *,
+          exercise:exercises(*)
+        )
+      )
     `)
     .eq('user_id', user.id)
     .is('completed_at', null)
@@ -176,7 +182,13 @@ export async function getSession(id: string) {
         exercise:exercises(*)
       ),
       program:programs(*),
-      workout:workouts(*)
+      workout:workouts(
+        *,
+        workout_exercises(
+          *,
+          exercise:exercises(*)
+        )
+      )
     `)
     .eq('id', id)
     .eq('user_id', user.id)
