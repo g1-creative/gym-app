@@ -56,7 +56,8 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
   }, [])
 
   // Combine exercises from logged sets and workout template
-  const templateExercises = (session.workout?.workout_exercises || [])
+  const workoutWithExercises = session.workout as any
+  const templateExercises = (workoutWithExercises?.workout_exercises || [])
     .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
     .map((we: any) => ({
       id: we.exercise_id,
@@ -65,8 +66,6 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
       notes: we.notes,
       rest_timer_seconds: we.rest_timer_seconds
     }))
-
-  const loggedExerciseIds = new Set(session.sets.map(set => set.exercise_id))
   
   const exercises = Array.from(
     new Map([
