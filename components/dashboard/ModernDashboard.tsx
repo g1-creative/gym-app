@@ -223,10 +223,14 @@ export default function ModernDashboard({
       <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-lg pb-24 sm:pb-28">
         {/* Header */}
         <header className="mb-4 sm:mb-6 dashboard-animate">
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-            <Dumbbell className="h-5 w-5 sm:h-6 sm:w-6 text-zinc-400" />
-            <span className="text-[10px] sm:text-xs tracking-[0.14em] uppercase text-zinc-400">
-              Gym Tracker
+          <div className="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
+            <img 
+              src="/gymville-logo.png" 
+              alt="Gymville" 
+              className="h-6 sm:h-7 w-auto"
+            />
+            <span className="text-sm sm:text-base font-semibold text-white">
+              Gymville
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-1">{greeting}</h1>

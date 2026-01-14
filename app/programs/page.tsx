@@ -5,6 +5,12 @@ import Link from 'next/link'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { Button } from '@/components/ui/button'
 import { Plus, Calendar, ArrowRight } from 'lucide-react'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Programs | Gymville',
+  description: 'Manage your training programs on Gymville',
+}
 
 export default async function ProgramsPage() {
   const supabase = await createClient()

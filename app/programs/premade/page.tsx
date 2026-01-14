@@ -1,6 +1,12 @@
 import { getPremadePrograms } from '@/app/actions/premade-programs'
 import { PremadeProgramsClient } from '@/components/programs/PremadeProgramsClient'
 import { PageLayout } from '@/components/layout/PageLayout'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Premade Programs | Gymville',
+  description: 'Browse and use premade training programs on Gymville',
+}
 
 export default async function PremadeProgramsPage() {
   try {

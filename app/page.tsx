@@ -3,6 +3,12 @@ import { createClient } from '@/lib/supabase/server'
 import { getActiveSession, getSessions } from './actions/sessions'
 import { getPrograms } from './actions/programs'
 import ModernDashboard from '@/components/dashboard/ModernDashboard'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Dashboard | Gymville',
+  description: 'Your Gymville workout dashboard',
+}
 
 // Force dynamic rendering to prevent caching issues
 export const dynamic = 'force-dynamic'
