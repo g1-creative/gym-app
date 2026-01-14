@@ -116,8 +116,8 @@ export async function copyPremadeProgram(programId: string) {
           workout_id: newWorkout.id,
           exercise_id: exerciseId,
           order_index: exerciseData.order_index || 0,
-          sets: null,
-          reps: null,
+          rest_timer_seconds: exerciseData.rest_timer_seconds || null,
+          notes: exerciseData.notes || null,
         })
 
         if (linkError) {
