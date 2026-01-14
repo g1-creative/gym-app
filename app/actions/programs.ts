@@ -74,51 +74,135 @@ export async function updateProgram(id: string, formData: FormData) {
 }
 
 export async function deleteProgram(id: string) {
-  const supabase = await createClient()
+  try {
+    const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
+    // Step 1: Verify authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      console.error('[DELETE PROGRAM] Auth error:', authError)
+      throw new Error('Unauthorized: User not authenticated')
+    }
 
-  // First, verify the program exists and belongs to the user
-  const verifyQuery = supabase.from('programs') as any
-  const { data: existingProgram, error: verifyError } = await verifyQuery
-    .select('id, user_id')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .is('deleted_at', null)
-    .single()
+    console.log(`[DELETE PROGRAM] Starting deletion for program ${id} by user ${user.id}`)
 
-  if (verifyError || !existingProgram) {
-    throw new Error('Program not found or you do not have permission to delete it')
+    // Step 2: Verify the program exists and belongs to the user
+    const verifyQuery = supabase.from('programs') as any
+    const { data: existingProgram, error: verifyError } = await verifyQuery
+      .select('id, user_id, name, is_premade')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .single()
+
+    if (verifyError) {
+      console.error('[DELETE PROGRAM] Verify error:', {
+        error: verifyError,
+        code: verifyError.code,
+        message: verifyError.message,
+        details: verifyError.details,
+        hint: verifyError.hint,
+        programId: id,
+        userId: user.id
+      })
+      throw new Error(`Program not found or you do not have permission to delete it: ${verifyError.message}`)
+    }
+
+    if (!existingProgram) {
+      console.error('[DELETE PROGRAM] Program not found:', { programId: id, userId: user.id })
+      throw new Error('Program not found or you do not have permission to delete it')
+    }
+
+    // Prevent deletion of premade programs
+    if (existingProgram.is_premade) {
+      console.error('[DELETE PROGRAM] Attempted to delete premade program:', { programId: id, programName: existingProgram.name })
+      throw new Error('Cannot delete premade programs')
+    }
+
+    console.log(`[DELETE PROGRAM] Program verified: ${existingProgram.name}`)
+
+    // Step 3: Soft delete all associated workout_sessions
+    const sessionsQuery = supabase.from('workout_sessions') as any
+    const { error: sessionsError, data: deletedSessions } = await sessionsQuery
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('program_id', id)
+      .is('deleted_at', null)
+      .select('id')
+
+    if (sessionsError) {
+      console.error('[DELETE PROGRAM] Error deleting workout sessions:', {
+        error: sessionsError,
+        programId: id
+      })
+      // Continue with deletion even if session deletion fails
+    } else {
+      console.log(`[DELETE PROGRAM] Soft deleted ${deletedSessions?.length || 0} workout sessions`)
+    }
+
+    // Step 4: Soft delete all associated workouts (and their workout_exercises via cascade)
+    const workoutsQuery = supabase.from('workouts') as any
+    const { error: workoutsError, data: deletedWorkouts } = await workoutsQuery
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('program_id', id)
+      .is('deleted_at', null)
+      .select('id')
+
+    if (workoutsError) {
+      console.error('[DELETE PROGRAM] Error deleting workouts:', {
+        error: workoutsError,
+        code: workoutsError.code,
+        message: workoutsError.message,
+        details: workoutsError.details,
+        programId: id
+      })
+      // Continue with program deletion even if workout deletion fails
+    } else {
+      console.log(`[DELETE PROGRAM] Soft deleted ${deletedWorkouts?.length || 0} workouts`)
+    }
+
+    // Step 5: Soft delete the program
+    const programQuery = supabase.from('programs') as any
+    const { error: deleteError } = await programQuery
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (deleteError) {
+      console.error('[DELETE PROGRAM] Error deleting program:', {
+        error: deleteError,
+        code: deleteError.code,
+        message: deleteError.message,
+        details: deleteError.details,
+        hint: deleteError.hint,
+        programId: id,
+        userId: user.id
+      })
+      throw new Error(`Failed to delete program: ${deleteError.message || 'Unknown error'}. Code: ${deleteError.code || 'N/A'}`)
+    }
+
+    console.log(`[DELETE PROGRAM] Successfully deleted program ${id}`)
+
+    // Step 6: Revalidate paths
+    revalidatePath('/programs')
+    revalidatePath(`/programs/${id}`)
+
+    return { success: true, id }
+  } catch (error: any) {
+    // Log the full error for Vercel logs
+    console.error('[DELETE PROGRAM] Fatal error:', {
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name,
+      programId: id,
+      timestamp: new Date().toISOString()
+    })
+
+    // Re-throw with a user-friendly message, but the full error is in logs
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error(`Failed to delete program: ${error?.message || 'Unknown error occurred'}`)
   }
-
-  // Soft delete all associated workouts first
-  const workoutsQuery = supabase.from('workouts') as any
-  const { error: workoutsError } = await workoutsQuery
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('program_id', id)
-    .is('deleted_at', null)
-
-  if (workoutsError) {
-    console.error('Error deleting associated workouts:', workoutsError)
-    // Continue with program deletion even if workout deletion fails
-  }
-
-  // Soft delete the program
-  const query = supabase.from('programs') as any
-  const { error } = await query
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('id', id)
-    .eq('user_id', user.id)
-
-  if (error) {
-    console.error('Error deleting program:', error)
-    throw new Error(`Failed to delete program: ${error.message || 'Unknown error'}`)
-  }
-
-  revalidatePath('/programs')
-  revalidatePath(`/programs/${id}`)
-  return { success: true, id }
 }
 
 export async function getPrograms() {
