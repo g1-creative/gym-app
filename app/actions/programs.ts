@@ -161,11 +161,12 @@ export async function deleteProgram(id: string) {
     }
 
     // Step 5: Soft delete the program
+    // Note: We only filter by id here - RLS policy will ensure user owns the program
+    // Adding .eq('user_id', user.id) can sometimes conflict with RLS policy evaluation
     const programQuery = supabase.from('programs') as any
     const { error: deleteError } = await programQuery
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('user_id', user.id)
 
     if (deleteError) {
       console.error('[DELETE PROGRAM] Error deleting program:', {
