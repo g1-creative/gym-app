@@ -67,14 +67,14 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
       rest_timer_seconds: we.rest_timer_seconds
     }))
   
-  const exercises = Array.from(
-    new Map([
+  const exercises: Array<[string, any]> = Array.from(
+    new Map<string, any>([
       // Add template exercises
-      ...templateExercises.map((te: any) => [te.id, te.exercise]),
+      ...templateExercises.map((te: any) => [te.id as string, te.exercise]),
       // Add any exercises from logged sets not in template
       ...session.sets
         .filter(set => !templateExercises.find((te: any) => te.id === set.exercise_id))
-        .map((set) => [set.exercise_id, (set as SetWithExercise).exercise])
+        .map((set) => [set.exercise_id as string, (set as SetWithExercise).exercise])
     ]).entries()
   )
 
