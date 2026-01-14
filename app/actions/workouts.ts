@@ -127,8 +127,12 @@ export async function deleteWorkout(id: string) {
       throw new Error('Workout not found')
     }
 
-    // Type assertion needed due to Supabase TypeScript inference limitations with SSR
-    const updateQuery = supabase.from('workouts') as any
+    // Use admin client to bypass RLS for the deletion
+    // This is safe because we've already verified ownership above
+    const { createAdminClient } = await import('@/lib/supabase/server')
+    const adminClient = createAdminClient()
+    
+    const updateQuery = adminClient.from('workouts') as any
     const { error } = await updateQuery
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)

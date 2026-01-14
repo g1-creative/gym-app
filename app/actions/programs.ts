@@ -121,8 +121,13 @@ export async function deleteProgram(id: string) {
 
     console.log(`[DELETE PROGRAM] Program verified: ${existingProgram.name}`)
 
+    // Use admin client to bypass RLS for deletions
+    // This is safe because we've already verified ownership above
+    const { createAdminClient } = await import('@/lib/supabase/server')
+    const adminClient = createAdminClient()
+
     // Step 3: Soft delete all associated workout_sessions
-    const sessionsQuery = supabase.from('workout_sessions') as any
+    const sessionsQuery = adminClient.from('workout_sessions') as any
     const { error: sessionsError, data: deletedSessions } = await sessionsQuery
       .update({ deleted_at: new Date().toISOString() })
       .eq('program_id', id)
@@ -140,7 +145,7 @@ export async function deleteProgram(id: string) {
     }
 
     // Step 4: Soft delete all associated workouts (and their workout_exercises via cascade)
-    const workoutsQuery = supabase.from('workouts') as any
+    const workoutsQuery = adminClient.from('workouts') as any
     const { error: workoutsError, data: deletedWorkouts } = await workoutsQuery
       .update({ deleted_at: new Date().toISOString() })
       .eq('program_id', id)
@@ -160,10 +165,8 @@ export async function deleteProgram(id: string) {
       console.log(`[DELETE PROGRAM] Soft deleted ${deletedWorkouts?.length || 0} workouts`)
     }
 
-    // Step 5: Soft delete the program
-    // Note: We only filter by id here - RLS policy will ensure user owns the program
-    // Adding .eq('user_id', user.id) can sometimes conflict with RLS policy evaluation
-    const programQuery = supabase.from('programs') as any
+    // Step 5: Soft delete the program using admin client (bypasses RLS)
+    const programQuery = adminClient.from('programs') as any
     const { error: deleteError } = await programQuery
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
