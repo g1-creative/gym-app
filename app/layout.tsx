@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-import { Nav } from '@/components/navigation/Nav'
-import BottomNavBar from '@/components/ui/bottom-nav-bar'
+import { ConditionalNav } from '@/components/layout/ConditionalNav'
+import { ConditionalWrapper } from '@/components/layout/ConditionalWrapper'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 import { ServiceWorkerUpdate } from '@/components/pwa/ServiceWorkerUpdate'
 import { LoadingScreen } from '@/components/LoadingScreen'
@@ -98,20 +98,13 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
-          {/* Desktop navigation - hidden on mobile */}
-          <div className="hidden md:block">
-            <Nav />
-          </div>
+          {/* Navigation - hidden on auth pages */}
+          <ConditionalNav />
           
-          {/* Main content with bottom padding on mobile for nav bar */}
-          <div className="pb-20 md:pb-0">
+          {/* Main content with conditional padding for bottom nav */}
+          <ConditionalWrapper>
             {children}
-          </div>
-          
-          {/* Mobile bottom navigation - hidden on desktop */}
-          <div className="md:hidden">
-            <BottomNavBar stickyBottom />
-          </div>
+          </ConditionalWrapper>
 
           {/* PWA Install Prompt */}
           <InstallPrompt />

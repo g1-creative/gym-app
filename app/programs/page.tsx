@@ -27,14 +27,14 @@ export default async function ProgramsPage() {
       title="Programs"
       subtitle={programs && programs.length > 0 ? `${programs.length} ${programs.length === 1 ? 'program' : 'programs'}` : undefined}
       headerAction={
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Link href="/programs/premade">
-            <Button variant="outline" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 h-auto">
+            <Button variant="outline" className="text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-9">
               Browse Templates
             </Button>
           </Link>
           <Link href="/programs/new">
-            <Button className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 h-auto">
+            <Button className="text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-9">
               <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5" />
               New
             </Button>

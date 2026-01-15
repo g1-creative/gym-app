@@ -178,7 +178,6 @@ CREATE POLICY "Users can view own programs" ON programs
 ### Application
 - Server Components reduce client bundle
 - API routes for heavy computations
-- Pagination for large datasets
 
 ### Caching
 - Next.js automatic caching
