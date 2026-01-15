@@ -34,6 +34,7 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
   const [isOnline, setIsOnline] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [showPlatesCalculator, setShowPlatesCalculator] = useState(false)
+  const [addedExercises, setAddedExercises] = useState<Map<string, any>>(new Map())
   const restTimerRef = useRef<RestTimerRef>(null)
   const router = useRouter()
 
@@ -55,6 +56,25 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
     }
   }, [])
 
+  // Initialize addedExercises from session sets on mount/refresh
+  useEffect(() => {
+    if (session.sets && session.sets.length > 0) {
+      const exercisesFromSets = new Map<string, any>()
+      session.sets.forEach((set: any) => {
+        if (set.exercise && set.exercise_id) {
+          exercisesFromSets.set(set.exercise_id, set.exercise)
+        }
+      })
+      setAddedExercises(prev => {
+        const combined = new Map(prev)
+        exercisesFromSets.forEach((exercise, id) => {
+          combined.set(id, exercise)
+        })
+        return combined
+      })
+    }
+  }, []) // Only run on mount
+
   // Combine exercises from logged sets and workout template
   const workoutWithExercises = session.workout as any
   const templateExercises = (workoutWithExercises?.workout_exercises || [])
@@ -67,14 +87,23 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
       rest_timer_seconds: we.rest_timer_seconds
     }))
   
+  // Get all exercise IDs that have been used (from sets or manually added)
+  const usedExerciseIds = new Set([
+    ...templateExercises.map((te: any) => te.id),
+    ...session.sets.map((set: any) => set.exercise_id),
+    ...Array.from(addedExercises.keys())
+  ])
+  
   const exercises: Array<[string, any]> = Array.from(
     new Map<string, any>([
       // Add template exercises
       ...templateExercises.map((te: any) => [te.id as string, te.exercise]),
-      // Add any exercises from logged sets not in template
+      // Add exercises from logged sets not in template
       ...session.sets
         .filter(set => !templateExercises.find((te: any) => te.id === set.exercise_id))
-        .map((set) => [set.exercise_id as string, (set as SetWithExercise).exercise])
+        .map((set) => [set.exercise_id as string, (set as SetWithExercise).exercise]),
+      // Add manually added exercises
+      ...Array.from(addedExercises.entries())
     ]).entries()
   )
 
@@ -435,7 +464,18 @@ export function ActiveWorkoutClient({ session: initialSession }: ActiveWorkoutCl
       <ExerciseSelector
         isOpen={showExerciseSelector}
         onClose={() => setShowExerciseSelector(false)}
-        onSelect={(exerciseId) => {
+        onSelect={async (exerciseId) => {
+          // Fetch exercise data and add to addedExercises state
+          try {
+            const { searchExercises } = await import('@/app/actions/exercises')
+            const results = await searchExercises('')
+            const exercise = results.find((e: any) => e.id === exerciseId)
+            if (exercise) {
+              setAddedExercises(prev => new Map(prev).set(exerciseId, exercise))
+            }
+          } catch (error) {
+            console.error('Error fetching exercise:', error)
+          }
           setSelectedExercise(exerciseId)
           setShowExerciseSelector(false)
         }}
