@@ -5,6 +5,7 @@ import { Providers } from './providers'
 import { Nav } from '@/components/navigation/Nav'
 import BottomNavBar from '@/components/ui/bottom-nav-bar'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
+import { LoadingScreen } from '@/components/LoadingScreen'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -79,6 +80,9 @@ export default function RootLayout({
 
           {/* PWA Install Prompt */}
           <InstallPrompt />
+          
+          {/* Loading Screen */}
+          <LoadingScreen />
         </Providers>
       </body>
     </html>
