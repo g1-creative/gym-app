@@ -14,13 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Eye,
   EyeOff,
-  Github,
-  Chrome,
   Lock,
   Mail,
   ArrowRight,
@@ -249,10 +246,10 @@ export default function ModernLoginForm() {
 
       {/* centered card with tabs */}
       <div className="h-full w-full grid place-items-center px-4">
-        <Card className="card-animate w-full max-w-md border-zinc-800 bg-zinc-900/70 backdrop-blur supports-[backdrop-filter]:bg-zinc-900/60">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription className="text-zinc-400">Log in or create your account</CardDescription>
+        <Card className="card-animate w-full max-w-md border-zinc-800/50 bg-zinc-900/80 backdrop-blur-xl supports-[backdrop-filter]:bg-zinc-900/70 shadow-2xl">
+          <CardHeader className="space-y-2 pb-6">
+            <CardTitle className="text-3xl font-bold text-white">Welcome</CardTitle>
+            <CardDescription className="text-zinc-400 text-base">Log in or create your account</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -271,11 +268,11 @@ export default function ModernLoginForm() {
               <div className="tab-shell mt-6">
                 {/* LOGIN */}
                 <TabsContent value="login" forceMount className="tab-panel">
-                  <form onSubmit={handleLogin} className="space-y-5">
-                    <div className="grid gap-2">
-                      <Label htmlFor="login-email" className="text-zinc-300">Email</Label>
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="grid gap-2.5">
+                      <Label htmlFor="login-email" className="text-zinc-200 font-medium">Email</Label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                         <Input
                           id="login-email"
                           type="email"
@@ -283,15 +280,15 @@ export default function ModernLoginForm() {
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
                           required
-                          className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
+                          className="pl-11 h-11 bg-zinc-950/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
                         />
                       </div>
                     </div>
 
-                    <div className="grid gap-2">
-                      <Label htmlFor="login-password" className="text-zinc-300">Password</Label>
+                    <div className="grid gap-2.5">
+                      <Label htmlFor="login-password" className="text-zinc-200 font-medium">Password</Label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                         <Input
                           id="login-password"
                           type={showLoginPw ? "text" : "password"}
@@ -300,11 +297,11 @@ export default function ModernLoginForm() {
                           onChange={(e) => setLoginPassword(e.target.value)}
                           required
                           minLength={6}
-                          className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
+                          className="pl-11 pr-11 h-11 bg-zinc-950/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
                         />
                         <button
                           type="button"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-zinc-400 hover:text-zinc-200"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-zinc-400 hover:text-zinc-200 transition-colors"
                           onClick={() => setShowLoginPw((v) => !v)}
                           aria-label={showLoginPw ? "Hide password" : "Show password"}
                         >
@@ -313,65 +310,51 @@ export default function ModernLoginForm() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2.5">
                         <Checkbox 
                           id="remember" 
                           checked={rememberMe}
                           onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                          className="border-zinc-700 data-[state=checked]:bg-zinc-50 data-[state=checked]:text-zinc-900" 
+                          className="border-zinc-600 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" 
                         />
-                        <Label htmlFor="remember" className="text-zinc-400">Remember me</Label>
+                        <Label htmlFor="remember" className="text-zinc-300 text-sm cursor-pointer">Remember me</Label>
                       </div>
-                      <a href="#" className="text-sm text-zinc-300 hover:text-zinc-100">Forgot password?</a>
+                      <a href="#" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">Forgot password?</a>
                     </div>
 
                     <Button 
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200"
+                      className="w-full h-11 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? 'Signing in...' : 'Continue'}
                     </Button>
-
-                    <div className="relative">
-                      <Separator className="bg-zinc-800" />
-                      <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-zinc-900/70 px-2 text-[11px] uppercase tracking-widest text-zinc-500">or</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button type="button" variant="outline" className="h-10 rounded-lg border-zinc-800 bg-zinc-950 text-zinc-50 hover:bg-zinc-900/80">
-                        <Github className="h-4 w-4 mr-2" /> GitHub
-                      </Button>
-                      <Button type="button" variant="outline" className="h-10 rounded-lg border-zinc-800 bg-zinc-950 text-zinc-50 hover:bg-zinc-900/80">
-                        <Chrome className="h-4 w-4 mr-2" /> Google
-                      </Button>
-                    </div>
                   </form>
                 </TabsContent>
 
                 {/* SIGN UP */}
                 <TabsContent value="signup" forceMount className="tab-panel">
-                  <form onSubmit={handleSignup} className="space-y-5">
-                    <div className="grid gap-2">
-                      <Label htmlFor="name" className="text-zinc-300">Full Name</Label>
+                  <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="grid gap-2.5">
+                      <Label htmlFor="name" className="text-zinc-200 font-medium">Full Name</Label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                         <Input
                           id="name"
                           type="text"
                           placeholder="John Doe"
                           value={signupName}
                           onChange={(e) => setSignupName(e.target.value)}
-                          className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
+                          className="pl-11 h-11 bg-zinc-950/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
                         />
                       </div>
                     </div>
 
-                    <div className="grid gap-2">
-                      <Label htmlFor="signup-email" className="text-zinc-300">Email</Label>
+                    <div className="grid gap-2.5">
+                      <Label htmlFor="signup-email" className="text-zinc-200 font-medium">Email</Label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                         <Input
                           id="signup-email"
                           type="email"
@@ -379,15 +362,15 @@ export default function ModernLoginForm() {
                           value={signupEmail}
                           onChange={(e) => setSignupEmail(e.target.value)}
                           required
-                          className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
+                          className="pl-11 h-11 bg-zinc-950/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
                         />
                       </div>
                     </div>
 
-                    <div className="grid gap-2">
-                      <Label htmlFor="signup-password" className="text-zinc-300">Password</Label>
+                    <div className="grid gap-2.5">
+                      <Label htmlFor="signup-password" className="text-zinc-200 font-medium">Password</Label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                         <Input
                           id="signup-password"
                           type={showSignupPw ? "text" : "password"}
@@ -396,11 +379,11 @@ export default function ModernLoginForm() {
                           onChange={(e) => setSignupPassword(e.target.value)}
                           required
                           minLength={6}
-                          className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
+                          className="pl-11 pr-11 h-11 bg-zinc-950/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20"
                         />
                         <button
                           type="button"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-zinc-400 hover:text-zinc-200"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-zinc-400 hover:text-zinc-200 transition-colors"
                           onClick={() => setShowSignupPw((v) => !v)}
                           aria-label={showSignupPw ? "Hide password" : "Show password"}
                         >
@@ -409,46 +392,28 @@ export default function ModernLoginForm() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5 pt-1">
                       <Checkbox 
                         id="terms" 
                         checked={acceptTerms}
                         onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
-                        className="border-zinc-700 data-[state=checked]:bg-zinc-50 data-[state=checked]:text-zinc-900" 
+                        className="border-zinc-600 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" 
                       />
-                      <Label htmlFor="terms" className="text-zinc-400 text-sm">I agree to the Terms & Privacy</Label>
+                      <Label htmlFor="terms" className="text-zinc-300 text-sm cursor-pointer">I agree to the Terms & Privacy</Label>
                     </div>
 
                     <Button 
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200"
+                      className="w-full h-11 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isLoading ? 'Creating account...' : 'Create account'}
                     </Button>
-
-                    <div className="relative">
-                      <Separator className="bg-zinc-800" />
-                      <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-zinc-900/70 px-2 text-[11px] uppercase tracking-widest text-zinc-500">or</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button type="button" variant="outline" className="h-10 rounded-lg border-zinc-800 bg-zinc-950 text-zinc-50 hover:bg-zinc-900/80">
-                        <Github className="h-4 w-4 mr-2" /> GitHub
-                      </Button>
-                      <Button type="button" variant="outline" className="h-10 rounded-lg border-zinc-800 bg-zinc-950 text-zinc-50 hover:bg-zinc-900/80">
-                        <Chrome className="h-4 w-4 mr-2" /> Google
-                      </Button>
-                    </div>
                   </form>
                 </TabsContent>
               </div>
             </Tabs>
           </CardContent>
-
-          <CardFooter className="flex items-center justify-center text-sm text-zinc-400">
-            Need help? <a className="ml-1 text-zinc-200 hover:underline" href="#">Contact support</a>
-          </CardFooter>
         </Card>
       </div>
     </section>
