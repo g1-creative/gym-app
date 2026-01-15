@@ -200,6 +200,7 @@ export default function ModernLoginForm() {
           display: grid;
           grid-template-columns: 1fr 1fr;
           width: 100%;
+          gap: 0;
         }
         .auth-tabs [role="tab"] {
           font-size: 13px; letter-spacing: .02em;
@@ -207,9 +208,21 @@ export default function ModernLoginForm() {
           align-items: center;
           justify-content: center;
           width: 100%;
+          color: #a1a1aa;
+          transition: all 0.2s ease;
+        }
+        .auth-tabs [role="tab"]:hover {
+          color: #ffffff;
         }
         .auth-tabs [role="tab"][data-state="active"] {
-          background: #111113; border-radius: 8px; box-shadow: inset 0 0 0 1px #27272a;
+          background: #18181b; 
+          border-radius: 8px; 
+          box-shadow: inset 0 0 0 1px #3f3f46;
+          color: #ffffff;
+          font-weight: 600;
+        }
+        .auth-tabs [role="tab"][data-state="inactive"] {
+          color: #71717a;
         }
       `}</style>
 
