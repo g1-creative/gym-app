@@ -20,16 +20,13 @@ import {
   EyeOff,
   Lock,
   Mail,
-  ArrowRight,
   User,
   Dumbbell,
 } from "lucide-react";
 import { login } from '@/app/actions/auth';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 
 export default function ModernLoginForm() {
-  const router = useRouter();
   const [showLoginPw, setShowLoginPw] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -241,14 +238,6 @@ export default function ModernLoginForm() {
             Gymville
           </span>
         </div>
-        <Button
-          variant="outline"
-          className="h-9 rounded-lg border-zinc-800 bg-zinc-900 text-zinc-50 hover:bg-zinc-900/80"
-          onClick={() => router.push('/')}
-        >
-          <span className="mr-2">Home</span>
-          <ArrowRight className="h-4 w-4" />
-        </Button>
       </header>
 
       {/* centered card with tabs */}
