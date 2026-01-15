@@ -127,6 +127,7 @@ export async function completeSession(id: string) {
 
   revalidatePath('/workout/active')
   revalidatePath('/history')
+  revalidatePath('/')
   return data
 }
 
