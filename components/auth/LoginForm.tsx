@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { login } from '@/app/actions/auth'
+import { logInfo, logError } from '@/lib/utils/logger'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -15,13 +16,13 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('[LOGIN] Form submitted')
+    logInfo('Login form submitted', { isSignUp })
     setIsLoading(true)
     setError(null)
 
     try {
       if (isSignUp) {
-        console.log('[LOGIN] Signing up...')
+        logInfo('Processing signup')
         const supabase = createClient()
         const { error } = await supabase.auth.signUp({
           email,
@@ -31,7 +32,7 @@ export function LoginForm() {
         alert('Check your email to confirm your account!')
         setIsLoading(false)
       } else {
-        console.log('[LOGIN] Using server action for login...')
+        logInfo('Processing login via server action')
         // Use server action which handles cookies properly
         const formData = new FormData()
         formData.append('email', email)
@@ -44,10 +45,10 @@ export function LoginForm() {
         }
         
         // Server action will redirect automatically
-        console.log('[LOGIN] Server action completed')
+        logInfo('Login server action completed')
       }
     } catch (err: any) {
-      console.error('[LOGIN] Exception:', err)
+      logError('Login failed', { error: err.message, isSignUp })
       setError(err.message || 'An error occurred')
       setIsLoading(false)
     }

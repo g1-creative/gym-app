@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getProgram } from '@/app/actions/programs'
 import { getWorkoutsForProgram } from '@/app/actions/workouts'
 import { ProgramDetailClient } from '@/components/programs/ProgramDetailClient'
+import { logError } from '@/lib/utils/logger'
 
 export default async function ProgramDetailPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -25,7 +26,7 @@ export default async function ProgramDetailPage({ params }: { params: { id: stri
     return <ProgramDetailClient program={program} workouts={workouts} />
   } catch (error: any) {
     // Log error for debugging
-    console.error('[PROGRAM PAGE] Error loading program:', {
+    logError('Error loading program', {
       error: error?.message,
       programId: params.id,
       code: error?.code

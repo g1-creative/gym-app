@@ -23,8 +23,8 @@ export function InstallPrompt() {
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e)
-      // Show prompt after 5 seconds
-      setTimeout(() => setShowPrompt(true), 5000)
+      // Show prompt immediately on mobile devices
+      setShowPrompt(true)
     }
 
     window.addEventListener('beforeinstallprompt', handler)
@@ -39,10 +39,6 @@ export function InstallPrompt() {
 
     deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt')
-    }
     
     setDeferredPrompt(null)
     setShowPrompt(false)

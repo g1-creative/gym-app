@@ -1,6 +1,8 @@
-const CACHE_NAME = 'gym-tracker-v1'
-const STATIC_CACHE = 'gym-tracker-static-v1'
-const DYNAMIC_CACHE = 'gym-tracker-dynamic-v1'
+// Version - increment this to force cache update
+const VERSION = '1.0.0'
+const CACHE_NAME = `gym-tracker-v${VERSION}`
+const STATIC_CACHE = `gym-tracker-static-v${VERSION}`
+const DYNAMIC_CACHE = `gym-tracker-dynamic-v${VERSION}`
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -13,9 +15,13 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS)
+      return cache.addAll(STATIC_ASSETS).catch((error) => {
+        // Silently fail if cache fails, app will still work
+        return Promise.resolve()
+      })
     })
   )
+  // Force the waiting service worker to become the active service worker
   self.skipWaiting()
 })
 
@@ -25,9 +31,19 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== STATIC_CACHE && name !== DYNAMIC_CACHE)
+          .filter((name) => name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== CACHE_NAME)
           .map((name) => caches.delete(name))
       )
+    }).then(() => {
+      // Notify all clients about the update
+      return self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({
+            type: 'SW_UPDATED',
+            version: VERSION,
+          })
+        })
+      })
     })
   )
   return self.clients.claim()
@@ -101,7 +117,7 @@ async function syncWorkouts() {
   // This would sync pending workout data when back online
   // Implementation depends on your offline storage strategy
   // You might use IndexedDB to store pending operations
-  console.log('Syncing workouts...')
+  // Sync implementation here
 }
 
 // Push notifications (optional - for rest timer alerts)

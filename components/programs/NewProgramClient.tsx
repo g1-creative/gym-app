@@ -34,7 +34,6 @@ export function NewProgramClient() {
         router.push(`/programs/${newProgram.id}`)
         router.refresh()
       } catch (error) {
-        console.error('Error creating program:', error)
         alert('Failed to create program. Please try again.')
       }
     })

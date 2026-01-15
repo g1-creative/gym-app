@@ -5,14 +5,20 @@ import { Providers } from './providers'
 import { Nav } from '@/components/navigation/Nav'
 import BottomNavBar from '@/components/ui/bottom-nav-bar'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
+import { ServiceWorkerUpdate } from '@/components/pwa/ServiceWorkerUpdate'
 import { LoadingScreen } from '@/components/LoadingScreen'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Gymville - Progressive Overload Tracker',
-  description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals with Gymville',
+  title: {
+    default: 'Gymville - Progressive Overload Tracker',
+    template: '%s | Gymville',
+  },
+  description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals with Gymville. A modern PWA for serious lifters.',
   applicationName: 'Gymville',
+  authors: [{ name: 'Gymville' }],
+  keywords: ['fitness', 'workout tracker', 'progressive overload', 'gym', 'strength training', 'weightlifting', 'pwa', 'fitness app'],
   manifest: '/manifest.json',
   icons: {
     icon: '/gymville-logo.png',
@@ -32,8 +38,37 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Gymville',
     title: 'Gymville - Progressive Overload Tracker',
-    description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals',
+    description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals with Gymville',
+    url: 'https://your-domain.com',
+    images: [
+      {
+        url: '/gymville-logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Gymville - Progressive Overload Tracker',
+      },
+    ],
+    locale: 'en_US',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gymville - Progressive Overload Tracker',
+    description: 'Track your workouts, monitor progressive overload, and achieve your fitness goals',
+    images: ['/gymville-logo.png'],
+    creator: '@gymville',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  category: 'fitness',
 }
 
 export const viewport: Viewport = {
@@ -80,6 +115,9 @@ export default function RootLayout({
 
           {/* PWA Install Prompt */}
           <InstallPrompt />
+          
+          {/* Service Worker Update Notification */}
+          <ServiceWorkerUpdate />
           
           {/* Loading Screen */}
           <LoadingScreen />

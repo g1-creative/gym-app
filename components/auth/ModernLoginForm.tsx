@@ -200,9 +200,16 @@ export default function ModernLoginForm() {
 
         .auth-tabs [role="tablist"] {
           background: #0f0f10; border: 1px solid #27272a; border-radius: 10px; padding: 4px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          width: 100%;
         }
         .auth-tabs [role="tab"] {
           font-size: 13px; letter-spacing: .02em;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
         }
         .auth-tabs [role="tab"][data-state="active"] {
           background: #111113; border-radius: 8px; box-shadow: inset 0 0 0 1px #27272a;
@@ -260,9 +267,9 @@ export default function ModernLoginForm() {
             )}
 
             <Tabs defaultValue="login" className="auth-tabs w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Log In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 gap-0">
+                <TabsTrigger value="login" className="w-full">Log In</TabsTrigger>
+                <TabsTrigger value="signup" className="w-full">Sign Up</TabsTrigger>
               </TabsList>
 
               <div className="tab-shell mt-6">

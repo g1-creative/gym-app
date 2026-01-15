@@ -10,28 +10,34 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/gymville-logo.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/gymville-logo.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/gymville-logo.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/gymville-logo.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/gymville-logo.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "categories": ["health", "fitness", "lifestyle"],
@@ -42,21 +48,21 @@
       "short_name": "Workout",
       "description": "Quickly start a new workout",
       "url": "/workout/new",
-      "icons": [{ "src": "/gymville-logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "View Programs",
       "short_name": "Programs",
       "description": "View your training programs",
       "url": "/programs",
-      "icons": [{ "src": "/gymville-logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Analytics",
       "short_name": "Analytics",
       "description": "View your progress and analytics",
       "url": "/analytics",
-      "icons": [{ "src": "/gymville-logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
