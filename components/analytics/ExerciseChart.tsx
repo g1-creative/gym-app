@@ -52,39 +52,46 @@ export function ExerciseChart({ data, dataKey, title, color = '#ffffff' }: Exerc
   }
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
-      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white">{title}</h3>
-      <ResponsiveContainer width="100%" height={250}>
+    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 sm:p-6 hover:border-zinc-700 transition-colors">
+      <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-white flex items-center gap-2">
+        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
+        {title}
+      </h3>
+      <ResponsiveContainer width="100%" height={300}>
         <LineChart data={formattedData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
           <XAxis
             dataKey="date"
-            stroke="#71717a"
-            style={{ fontSize: '11px' }}
+            stroke="#52525b"
+            style={{ fontSize: '12px' }}
             tick={{ fill: '#a1a1aa' }}
           />
           <YAxis
-            stroke="#71717a"
-            style={{ fontSize: '11px' }}
+            stroke="#52525b"
+            style={{ fontSize: '12px' }}
             tick={{ fill: '#a1a1aa' }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#18181b',
+              backgroundColor: '#09090b',
               border: '1px solid #27272a',
-              borderRadius: '8px',
+              borderRadius: '12px',
               color: '#fff',
+              padding: '12px',
             }}
             formatter={(value: any) => formatTooltipValue(value)}
+            labelStyle={{ color: '#a1a1aa', marginBottom: '4px' }}
           />
-          <Legend wrapperStyle={{ fontSize: '12px', color: '#a1a1aa' }} />
+          <Legend 
+            wrapperStyle={{ fontSize: '13px', color: '#a1a1aa', paddingTop: '16px' }} 
+          />
           <Line
             type="monotone"
             dataKey={dataKey}
             stroke={color}
-            strokeWidth={2}
-            dot={{ fill: color, r: 3 }}
-            activeDot={{ r: 5 }}
+            strokeWidth={3}
+            dot={{ fill: color, r: 4, strokeWidth: 2, stroke: '#18181b' }}
+            activeDot={{ r: 6, strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>
