@@ -29,7 +29,7 @@ export default async function ProgramsPage() {
       headerAction={
         <div className="flex items-center gap-2">
           <Link href="/programs/premade">
-            <Button variant="outline" className="text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-9">
+            <Button variant="outline" className="text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-9 !text-zinc-900 !bg-white !border-zinc-300 hover:!bg-zinc-50 hover:!text-zinc-950">
               Browse Templates
             </Button>
           </Link>
