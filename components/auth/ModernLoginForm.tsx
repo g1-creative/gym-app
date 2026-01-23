@@ -141,20 +141,28 @@ export default function ModernLoginForm() {
 
     try {
       const supabase = createClient();
-      const { error: signupError } = await supabase.auth.signUp({
+      const { data, error: signupError } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
           data: {
             full_name: signupName,
           },
+          emailRedirectTo: window.location.origin,
         },
       });
 
       if (signupError) throw signupError;
 
-      alert("Success! Check your email to confirm your account.");
-      setIsLoading(false);
+      // If auto-confirm is enabled in Supabase, user will be logged in
+      // Redirect to home page
+      if (data.session) {
+        window.location.href = '/';
+      } else {
+        // If email confirmation is required
+        setError("Please check your email to confirm your account before logging in.");
+        setIsLoading(false);
+      }
     } catch (err: any) {
       setError(err.message || "Signup failed. Please try again.");
       setIsLoading(false);
