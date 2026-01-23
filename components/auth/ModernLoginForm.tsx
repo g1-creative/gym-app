@@ -203,26 +203,26 @@ export default function ModernLoginForm() {
           gap: 0;
         }
         .auth-tabs [role="tab"] {
-          font-size: 13px; letter-spacing: .02em;
+          font-size: 14px; 
+          letter-spacing: .02em;
           display: flex;
           align-items: center;
           justify-content: center;
           width: 100%;
-          color: #a1a1aa;
+          color: #a1a1aa !important;
           transition: all 0.2s ease;
+          cursor: pointer;
+          font-weight: 500;
         }
         .auth-tabs [role="tab"]:hover {
-          color: #ffffff;
+          color: #e4e4e7 !important;
         }
         .auth-tabs [role="tab"][data-state="active"] {
-          background: #18181b; 
+          background: #18181b !important; 
           border-radius: 8px; 
-          box-shadow: inset 0 0 0 1px #3f3f46;
-          color: #ffffff;
+          box-shadow: inset 0 0 0 1px #3f3f46 !important;
+          color: #ffffff !important;
           font-weight: 600;
-        }
-        .auth-tabs [role="tab"][data-state="inactive"] {
-          color: #71717a;
         }
       `}</style>
 
